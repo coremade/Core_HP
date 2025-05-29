@@ -1,20 +1,34 @@
 const { Sequelize } = require("sequelize");
-const DeveloperModel = require("./developer.model");
+const config = require('../config/database');
 
-const sequelize = new Sequelize("dev_management", "devuser", "devpass", {
-  host: "localhost",
-  port: 3306,
-  dialect: "mysql",
-  logging: false,
-  timezone: "+09:00",
-});
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  {
+    host: config.host,
+    port: config.port,
+    dialect: config.dialect,
+    logging: false,
+    pool: config.pool
+  }
+);
 
-const Developer = DeveloperModel(sequelize);
+// 모델 정의
+const Developer = require('./developer.model')(sequelize);
+const MasterCode = require('./masterCode.model')(sequelize);
+const DetailCode = require('./detailCode.model')(sequelize);
 
-const db = {
+// 모델 관계 설정
+// Developer.hasMany(DetailCode, { foreignKey: 'developer_id' });
+// DetailCode.belongsTo(Developer, { foreignKey: 'developer_id' });
+
+MasterCode.hasMany(DetailCode, { foreignKey: 'master_id' });
+DetailCode.belongsTo(MasterCode, { foreignKey: 'master_id' });
+
+module.exports = {
   sequelize,
-  Sequelize,
   Developer,
+  MasterCode,
+  DetailCode
 };
-
-module.exports = db;
