@@ -17,4 +17,5 @@ const sequelize = new Sequelize({
   logging: console.log
 });
 
-module.exports = sequelize;
+module.exports = sequelize; 
+>>>>>>> b580f37ad55b33abf92643c4f8993b6ba51af92e
