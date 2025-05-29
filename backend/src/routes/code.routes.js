@@ -6,7 +6,6 @@ const { MasterCode, DetailCode } = require("../models");
 router.get("/master", async (req, res) => {
   try {
     const masterCodes = await MasterCode.findAll({
-      where: { use_yn: 'Y' },
       order: [['master_name', 'ASC']]
     });
     res.set({
@@ -30,13 +29,9 @@ router.get("/detail", async (req, res) => {
     }
 
     const detailCodes = await DetailCode.findAll({
-      where: { 
-        master_id,
-        use_yn: 'Y'
-      },
+      where: { master_id },
       order: [['sort_order', 'ASC']]
     });
-    
     res.status(200).json(detailCodes);
   } catch (error) {
     console.error('상세 코드 조회 실패:', error);
@@ -50,8 +45,7 @@ router.get("/detail/:masterId", async (req, res) => {
     const { masterId } = req.params;
     const detailCodes = await DetailCode.findAll({
       where: {
-        master_id: masterId,
-        use_yn: 'Y'
+        master_id: masterId
       },
       order: [['sort_order', 'ASC']]
     });
@@ -128,15 +122,12 @@ router.put("/master/:id", async (req, res) => {
   }
 });
 
-// 마스터 코드 삭제 (실제로는 use_yn을 'N'으로 변경)
+// 마스터 코드 삭제 (실제 DB 삭제)
 router.delete("/master/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [updated] = await MasterCode.update(
-      { use_yn: 'N' },
-      { where: { master_id: id } }
-    );
-    if (updated) {
+    const deleted = await MasterCode.destroy({ where: { master_id: id } });
+    if (deleted) {
       res.status(200).json({ message: '마스터 코드가 삭제되었습니다.' });
     } else {
       res.status(404).json({ message: '마스터 코드를 찾을 수 없습니다.' });
@@ -177,15 +168,12 @@ router.put("/detail/:id", async (req, res) => {
   }
 });
 
-// 상세 코드 삭제 (실제로는 use_yn을 'N'으로 변경)
+// 상세 코드 삭제 (실제 DB 삭제)
 router.delete("/detail/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const [updated] = await DetailCode.update(
-      { use_yn: 'N' },
-      { where: { detail_id: id } }
-    );
-    if (updated) {
+    const deleted = await DetailCode.destroy({ where: { detail_id: id } });
+    if (deleted) {
       res.status(200).json({ message: '상세 코드가 삭제되었습니다.' });
     } else {
       res.status(404).json({ message: '상세 코드를 찾을 수 없습니다.' });

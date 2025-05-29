@@ -20,6 +20,15 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Sequelize 모델 동기화 및 캐시 초기화
+sequelize.sync({ alter: true }).then(() => {
+  console.log('데이터베이스 연결 성공');
+  // Sequelize 캐시 초기화
+  sequelize.models.DetailCode.refreshAttributes();
+}).catch(err => {
+  console.error('데이터베이스 연결 실패:', err);
+});
+
 // 라우트 설정
 app.get("/", (req, res) => {
   res.json({
@@ -37,18 +46,10 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/common-codes", codeRoutes);
 
-// 데이터베이스 연결 및 서버 시작
-sequelize
-  .sync({ force: false })
-  .then(() => {
-    console.log("데이터베이스 연결 성공");
-    app.listen(PORT, () => {
-      console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
-    });
-  })
-  .catch((err) => {
-    console.error("데이터베이스 연결 실패:", err);
-  });
+// 서버 시작
+app.listen(PORT, () => {
+  console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
+});
 
 // 에러 핸들링
 app.use((err, req, res, next) => {

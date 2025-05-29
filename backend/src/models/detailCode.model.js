@@ -29,26 +29,10 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: '설명'
     },
-    use_yn: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-      defaultValue: 'Y',
-      comment: '사용여부'
-    },
     extra_value1: {
       type: DataTypes.STRING(200),
       allowNull: true,
       comment: '추가값1'
-    },
-    extra_value2: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-      comment: '추가값2'
-    },
-    extra_value3: {
-      type: DataTypes.STRING(200),
-      allowNull: true,
-      comment: '추가값3'
     },
     created_at: {
       type: DataTypes.DATE,

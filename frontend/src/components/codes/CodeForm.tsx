@@ -30,9 +30,17 @@ interface CodeFormProps {
 }
 
 const validationSchema = yup.object({
-  master_id: yup.string().required('코드 ID는 필수입니다'),
-  master_name: yup.string().required('코드명은 필수입니다'),
-  description: yup.string(),
+  master_id: yup
+    .string()
+    .required('코드 ID는 필수입니다')
+    .matches(/^[A-Z]+$/, '코드 ID는 대문자 영문만 입력 가능합니다.'),
+  master_name: yup
+    .string()
+    .required('코드명은 필수입니다')
+    .matches(/^[가-힣a-zA-Z0-9\s]+$/, '코드명은 한글, 영문, 숫자만 입력 가능합니다.'),
+  description: yup
+    .string()
+    .matches(/^[가-힣a-zA-Z0-9\s]*$/, '설명은 한글, 영문, 숫자만 입력 가능합니다.'),
 });
 
 export default function CodeForm({ open, onClose, onSubmit, editingCode, initialValues }: CodeFormProps) {
@@ -69,7 +77,6 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
       master_id: editingCode?.master_id || '',
       master_name: editingCode?.master_name || '',
       description: editingCode?.description || '',
-      use_yn: editingCode?.use_yn || 'Y',
     },
     validationSchema,
     onSubmit: (values) => {
@@ -79,7 +86,6 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
           data: {
             master_name: values.master_name,
             description: values.description,
-            use_yn: values.use_yn as 'Y' | 'N',
           },
         });
       } else {
@@ -87,7 +93,6 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
           master_id: values.master_id,
           master_name: values.master_name,
           description: values.description,
-          use_yn: values.use_yn as 'Y' | 'N',
         });
       }
     },
@@ -98,6 +103,24 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
       formik.setValues(initialValues);
     }
   }, [initialValues]);
+
+  const handleMasterIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 대문자 영문만 허용
+    const value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+    formik.setFieldValue('master_id', value);
+  };
+
+  const handleMasterNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 한글, 영문, 숫자, 공백만 허용
+    const value = e.target.value.replace(/[^가-힣a-zA-Z0-9\s]/g, '');
+    formik.setFieldValue('master_name', value);
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 한글, 영문, 숫자, 공백만 허용
+    const value = e.target.value.replace(/[^가-힣a-zA-Z0-9\s]/g, '');
+    formik.setFieldValue('description', value);
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -111,7 +134,7 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
               name="master_id"
               label="코드 ID"
               value={formik.values.master_id}
-              onChange={formik.handleChange}
+              onChange={handleMasterIdChange}
               error={formik.touched.master_id && Boolean(formik.errors.master_id)}
               helperText={formik.touched.master_id && formik.errors.master_id}
               disabled={isEditing}
@@ -122,7 +145,7 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
               name="master_name"
               label="코드명"
               value={formik.values.master_name}
-              onChange={formik.handleChange}
+              onChange={handleMasterNameChange}
               error={formik.touched.master_name && Boolean(formik.errors.master_name)}
               helperText={formik.touched.master_name && formik.errors.master_name}
             />
@@ -132,20 +155,9 @@ export default function CodeForm({ open, onClose, onSubmit, editingCode, initial
               name="description"
               label="설명"
               value={formik.values.description}
-              onChange={formik.handleChange}
+              onChange={handleDescriptionChange}
               multiline
               rows={3}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formik.values.use_yn === 'Y'}
-                  onChange={(e) =>
-                    formik.setFieldValue('use_yn', e.target.checked ? 'Y' : 'N')
-                  }
-                />
-              }
-              label="사용 여부"
             />
           </Box>
         </DialogContent>

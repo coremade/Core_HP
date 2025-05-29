@@ -119,10 +119,10 @@ export default function MasterCodeList({ onSelectMaster, searchKeyword, selected
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
         <Box>
-          <IconButton edge="end" size="small" onClick={() => handleEdit(params.row as MasterCode)}>
+          <IconButton edge="end" size="small" color="primary" onClick={() => handleEdit(params.row as MasterCode)}>
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton edge="end" size="small" onClick={() => handleDelete(params.row as MasterCode)}>
+          <IconButton edge="end" size="small" color="error" onClick={() => handleDelete(params.row as MasterCode)}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -135,7 +135,7 @@ export default function MasterCodeList({ onSelectMaster, searchKeyword, selected
   }
 
   return (
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">마스터 코드</Typography>
         <Button
@@ -147,7 +147,7 @@ export default function MasterCodeList({ onSelectMaster, searchKeyword, selected
           행추가
         </Button>
       </Box>
-      <Paper sx={{ flex: 1 }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <DataGrid
           rows={filteredCodes}
           columns={columns}
@@ -155,6 +155,8 @@ export default function MasterCodeList({ onSelectMaster, searchKeyword, selected
           pageSizeOptions={[10, 25, 50, 100]}
           density="compact"
           sx={{
+            flex: 1,
+            minHeight: 0,
             '& .MuiDataGrid-row.selected': {
               backgroundColor: 'rgba(25, 118, 210, 0.08) !important',
             },

@@ -40,7 +40,7 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
 
 export const Table = ({ columns, rows, onRowClick }: TableProps) => {
   return (
-    <StyledTableContainer component={Paper}>
+    <StyledTableContainer>
       <MuiTable stickyHeader>
         <TableHead>
           <TableRow>

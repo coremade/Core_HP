@@ -18,12 +18,6 @@ module.exports = (sequelize) => {
       allowNull: true,
       comment: '설명'
     },
-    use_yn: {
-      type: DataTypes.CHAR(1),
-      allowNull: false,
-      defaultValue: 'Y',
-      comment: '사용여부'
-    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,
