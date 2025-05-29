@@ -85,6 +85,7 @@ export default function DetailCodeForm({
       extra_value1: editingCode?.extra_value1 || '',
       master_id: masterId,
     },
+    enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
       if (isEditing) {

@@ -141,7 +141,10 @@ export default function MasterCodeList({ onSelectMaster, searchKeyword, selected
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingCode(null);
+            setIsFormOpen(true);
+          }}
           size="small"
         >
           행추가
