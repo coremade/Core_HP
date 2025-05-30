@@ -1,157 +1,204 @@
-export default function DevelopersPage() {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            개발자 관리
-          </h1>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors">
-            개발자 등록
-          </button>
-        </div>
+'use client';
 
-        {/* 개발자 목록 */}
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                >
-                  이름
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                >
-                  직급
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                >
-                  주요 기술
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                >
-                  상태
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src="https://ui-avatars.com/api/?name=홍길동"
-                        alt=""
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        홍길동
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        hong@example.com
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900 dark:text-white">
-                    시니어 개발자
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      React
-                    </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      Node.js
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                    프로젝트 진행중
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                      수정
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                      삭제
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <img
-                        className="h-10 w-10 rounded-full"
-                        src="https://ui-avatars.com/api/?name=김철수"
-                        alt=""
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        김철수
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        kim@example.com
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900 dark:text-white">
-                    주니어 개발자
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      JavaScript
-                    </span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      Python
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                    대기중
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                      수정
-                    </button>
-                    <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                      삭제
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+import { useState } from 'react';
+import { Container, Box, Typography, Snackbar, Alert } from '@mui/material';
+import DeveloperList from '../../components/developers/DeveloperList';
+import DeveloperDetailForm from '../../components/developers/DeveloperDetailForm';
+import DeveloperSearchBar from '../../components/developers/DeveloperSearchBar';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { developerService } from '../../services/developerService';
+import type { Developer, CreateDeveloperDto } from '../../services/developerService';
+import type { SearchFilters } from '../../components/developers/DeveloperSearchBar';
+
+export default function DevelopersPage() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['developers', page, pageSize, searchKeyword],
+    queryFn: () => developerService.getDevelopers({ page, pageSize, searchKeyword }),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: developerService.createDeveloper,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['developers'] });
+      setIsCreating(false);
+      setSuccessMessage('개발자가 성공적으로 등록되었습니다.');
+    },
+    onError: (error: any) => {
+      setErrorMessage(error.response?.data?.message || '개발자 등록 중 오류가 발생했습니다.');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Developer> }) =>
+      developerService.updateDeveloper(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['developers'] });
+      setSuccessMessage('개발자 정보가 성공적으로 수정되었습니다.');
+    },
+    onError: (error: any) => {
+      setErrorMessage(error.response?.data?.message || '개발자 정보 수정 중 오류가 발생했습니다.');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (ids: (string | number)[]) => {
+      const stringIds = ids.map(id => id.toString());
+      return developerService.deleteDevelopers(stringIds);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['developers'] });
+      setSuccessMessage('선택한 개발자가 성공적으로 삭제되었습니다.');
+      setSelectedDeveloper(null);
+    },
+    onError: (error: any) => {
+      setErrorMessage(error.response?.data?.message || '개발자 삭제 중 오류가 발생했습니다.');
+    },
+  });
+
+  const handleSearch = (filters: SearchFilters) => {
+    const keyword = Object.values(filters)
+      .filter(value => value)
+      .join(' ');
+    setSearchKeyword(keyword);
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
+  };
+
+  const handleCreateNew = () => {
+    setSelectedDeveloper(null);
+    setIsCreating(true);
+  };
+
+  const handleSaveDeveloper = async (developer: Partial<Developer>) => {
+    try {
+      if (isCreating) {
+        const newDeveloper: CreateDeveloperDto = {
+          developer_name: developer.developer_name || '',
+          developer_birth: developer.developer_birth || '',
+          developer_sex: developer.developer_sex || '',
+          developer_email: developer.developer_email || '',
+          developer_phone: developer.developer_phone,
+          developer_addr: developer.developer_addr || '',
+          developer_profile_image: developer.developer_profile_image,
+          developer_start_date: developer.developer_start_date,
+          developer_career_start_date: developer.developer_career_start_date,
+          developer_current_position: developer.developer_current_position || '',
+          developer_grade: developer.developer_grade || '',
+          developer_married: developer.developer_married,
+          developer_military_start_date: developer.developer_military_start_date,
+          developer_military_end_date: developer.developer_military_end_date,
+          developer_military_desc: developer.developer_military_desc,
+        };
+        await createMutation.mutateAsync(newDeveloper);
+      } else if (selectedDeveloper) {
+        await updateMutation.mutateAsync({
+          id: selectedDeveloper.developer_id,
+          data: developer,
+        });
+      }
+    } catch (error) {
+      // 에러는 mutation의 onError에서 처리됩니다.
+      console.error('Error saving developer:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsCreating(false);
+    setSelectedDeveloper(null);
+  };
+
+  const handleDeleteDevelopers = async (ids: (string | number)[]) => {
+    try {
+      await deleteMutation.mutateAsync(ids);
+    } catch (error) {
+      console.error('Error deleting developers:', error);
+      setErrorMessage('개발자 삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        onClose={() => setSuccessMessage('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSuccessMessage('')}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage('')}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setErrorMessage('')}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+
+      <Typography variant="h4" component="h1" gutterBottom>
+        개발자 관리
+      </Typography>
+
+      <Box sx={{ mb: 3 }}>
+        <DeveloperSearchBar onSearch={handleSearch} />
+      </Box>
+      
+      <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ flex: '0 0 50%' }}>
+          <DeveloperList
+            developers={data?.developers || []}
+            selectedDeveloperId={selectedDeveloper?.developer_id || null}
+            onSelectDeveloper={setSelectedDeveloper}
+            onCreateNew={handleCreateNew}
+            onDeleteDevelopers={handleDeleteDevelopers}
+            page={page}
+            pageSize={pageSize}
+            totalCount={data?.total || 0}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            isLoading={isLoading}
+          />
+        </Box>
+        <Box sx={{ flex: '0 0 50%' }}>
+          <DeveloperDetailForm
+            developer={selectedDeveloper}
+            isCreating={isCreating}
+            onSave={handleSaveDeveloper}
+            onCancel={handleCancel}
+          />
+        </Box>
+      </Box>
+    </Container>
   );
 }

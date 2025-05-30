@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const sequelize = require("./config/database");
+const { sequelize } = require("./models");
 const developerRoutes = require("./routes/developer.routes");
 const resumeRoutes = require("./routes/resume.routes");
 const skillRoutes = require("./routes/skill.routes");
@@ -13,12 +13,25 @@ const codeRoutes = require("./routes/code.routes");
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// CORS 설정
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://192.168.0.7:3000'],
+  credentials: true
+}));
+
 // 미들웨어 설정
-app.use(cors());
 app.use(helmet());
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// 요청 로깅 미들웨어
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  console.log('Query:', req.query);
+  console.log('Body:', req.body);
+  next();
+});
 
 // 라우트 설정
 app.get("/", (req, res) => {
@@ -42,7 +55,7 @@ sequelize
   .sync({ force: false })
   .then(() => {
     console.log("데이터베이스 연결 성공");
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
     });
   })
