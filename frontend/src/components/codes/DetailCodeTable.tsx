@@ -28,6 +28,7 @@ interface DetailCodeTableProps {
 export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeTableProps) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCode, setEditingCode] = useState<DetailCode | null>(null);
+  const [initialValues, setInitialValues] = useState<Partial<DetailCode> | null>(null);
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 10,
     page: 0,
@@ -59,19 +60,17 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
 
   const handleAddRow = () => {
     const newCode: Partial<DetailCode> = {
-      detail_id: `NEW_${Date.now()}`,
+      detail_id: '',
       master_id: masterId!,
       detail_name: '',
       sort_order: filteredCodes.length + 1,
       description: '',
-      use_yn: 'Y',
       extra_value1: '',
-      extra_value2: '',
-      extra_value3: '',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    setEditingCode(newCode as DetailCode);
+    setEditingCode(null);
+    setInitialValues(newCode);
     setIsFormOpen(true);
   };
 
@@ -84,6 +83,7 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
       component: 'DetailCodeTable'
     });
     setEditingCode(code);
+    setInitialValues(null);
     setIsFormOpen(true);
   };
 
@@ -119,9 +119,10 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
 
   const columns: GridColDef[] = [
     { field: 'detail_id', headerName: '코드', width: 120 },
-    { field: 'detail_name', headerName: '코드명', width: 200 },
-    { field: 'sort_order', headerName: '정렬순서', width: 100, type: 'number' },
-    { field: 'description', headerName: '설명', width: 300 },
+    { field: 'detail_name', headerName: '코드명', width: 150 },
+    { field: 'sort_order', headerName: '정렬순서', width: 80, type: 'number' },
+    { field: 'description', headerName: '설명', width: 250 },
+    { field: 'extra_value1', headerName: '추가값1', width: 100 },
     {
       field: 'actions',
       headerName: '작업',
@@ -132,6 +133,7 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
           <Tooltip title="수정">
             <IconButton
               size="small"
+              color="primary"
               onClick={() => handleEdit(params.row)}
             >
               <EditIcon fontSize="small" />
@@ -165,7 +167,7 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
   }
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">상세 코드</Typography>
         <Stack direction="row" spacing={1}>
@@ -180,7 +182,7 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
         </Stack>
       </Box>
 
-      <Paper sx={{ flex: 1 }}>
+      <Paper sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <DataGrid
           rows={filteredCodes}
           columns={columns}
@@ -190,6 +192,7 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
           pageSizeOptions={[10, 25, 50, 100]}
           density="compact"
           disableRowSelectionOnClick
+          sx={{ flex: 1, minHeight: 0 }}
           initialState={{
             pagination: {
               paginationModel: { pageSize: 10, page: 0 },
@@ -204,12 +207,13 @@ export default function DetailCodeTable({ masterId, searchKeyword }: DetailCodeT
         onSubmit={handleFormSubmit}
         masterId={masterId}
         editingCode={editingCode}
-        initialValues={editingCode ? {
-          detail_id: editingCode.detail_id,
-          detail_name: editingCode.detail_name,
-          description: editingCode.description || '',
-          use_yn: editingCode.use_yn || 'Y',
-          sort_order: editingCode.sort_order || 0
+        initialValues={initialValues ? {
+          detail_id: initialValues.detail_id || '',
+          detail_name: initialValues.detail_name || '',
+          description: initialValues.description || '',
+          sort_order: initialValues.sort_order || 0,
+          extra_value1: initialValues.extra_value1 || '',
+          master_id: initialValues.master_id || masterId || ''
         } : undefined}
       />
     </Box>

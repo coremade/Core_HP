@@ -1,18 +1,4 @@
-const { Sequelize } = require("sequelize");
-const config = require('../config/database');
-
-const sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  {
-    host: config.host,
-    port: config.port,
-    dialect: config.dialect,
-    logging: false,
-    pool: config.pool
-  }
-);
+const sequelize = require('../config/database');
 
 // 모델 정의
 const Developer = require('./developer.model')(sequelize);

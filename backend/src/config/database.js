@@ -14,4 +14,6 @@ module.exports = {
     idle: 10000
   },
   logging: console.log
-}; 
+});
+
+module.exports = sequelize; 

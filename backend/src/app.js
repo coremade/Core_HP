@@ -25,6 +25,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 // 요청 로깅 미들웨어
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -49,6 +50,7 @@ app.use("/api/resumes", resumeRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/common-codes", codeRoutes);
+
 
 // 데이터베이스 연결 및 서버 시작
 sequelize

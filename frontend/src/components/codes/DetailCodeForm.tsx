@@ -26,8 +26,9 @@ interface DetailCodeFormProps {
     detail_id: string;
     detail_name: string;
     description: string;
-    use_yn: 'Y' | 'N';
     sort_order: number;
+    extra_value1: string;
+    master_id: string;
   };
 }
 
@@ -37,8 +38,6 @@ const validationSchema = yup.object({
   sort_order: yup.number().min(0, '정렬 순서는 0 이상이어야 합니다'),
   description: yup.string(),
   extra_value1: yup.string(),
-  extra_value2: yup.string(),
-  extra_value3: yup.string(),
 });
 
 export default function DetailCodeForm({
@@ -79,13 +78,14 @@ export default function DetailCodeForm({
 
   const formik = useFormik<CreateDetailCodeDto>({
     initialValues: initialValues || {
-      detail_id: editingCode?.detail_id || `NEW_${Date.now()}`,
+      detail_id: editingCode?.detail_id || '',
       detail_name: editingCode?.detail_name || '',
       description: editingCode?.description || '',
-      use_yn: editingCode?.use_yn || 'Y',
       sort_order: editingCode?.sort_order || 0,
+      extra_value1: editingCode?.extra_value1 || '',
       master_id: masterId,
     },
+    enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
       if (isEditing) {
@@ -94,8 +94,8 @@ export default function DetailCodeForm({
           data: {
             detail_name: values.detail_name,
             description: values.description,
-            use_yn: values.use_yn as 'Y' | 'N',
             sort_order: values.sort_order,
+            extra_value1: values.extra_value1,
           },
         });
       } else {
@@ -103,9 +103,9 @@ export default function DetailCodeForm({
           detail_id: values.detail_id,
           detail_name: values.detail_name,
           description: values.description,
-          use_yn: values.use_yn as 'Y' | 'N',
           sort_order: values.sort_order,
           master_id: masterId,
+          extra_value1: values.extra_value1,
         });
       }
     },
@@ -113,9 +113,12 @@ export default function DetailCodeForm({
 
   useEffect(() => {
     if (initialValues) {
-      formik.setValues(initialValues);
+      formik.setValues({
+        ...initialValues,
+        master_id: masterId,
+      });
     }
-  }, [initialValues]);
+  }, [initialValues, masterId]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -172,33 +175,6 @@ export default function DetailCodeForm({
               label="추가값1"
               value={formik.values.extra_value1}
               onChange={formik.handleChange}
-            />
-            <TextField
-              fullWidth
-              id="extra_value2"
-              name="extra_value2"
-              label="추가값2"
-              value={formik.values.extra_value2}
-              onChange={formik.handleChange}
-            />
-            <TextField
-              fullWidth
-              id="extra_value3"
-              name="extra_value3"
-              label="추가값3"
-              value={formik.values.extra_value3}
-              onChange={formik.handleChange}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formik.values.use_yn === 'Y'}
-                  onChange={(e) =>
-                    formik.setFieldValue('use_yn', e.target.checked ? 'Y' : 'N')
-                  }
-                />
-              }
-              label="사용 여부"
             />
           </Box>
         </DialogContent>

@@ -42,6 +42,7 @@ const StyledTableContainer = styled(TableContainer)({
 
 export const Table = <T extends Record<string, any>>({ columns, rows, onRowClick, renderCell }: TableProps<T>) => {
   return (
+
     <Paper>
       <StyledTableContainer>
         <MuiTable stickyHeader>
