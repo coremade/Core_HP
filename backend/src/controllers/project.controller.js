@@ -1,9 +1,5 @@
 const { Op } = require('sequelize');
-const sequelize = require('../config/database');
-const Project = require('../models/Project');
-const Developer = require('../models/Developer');
-const ProjectAssignment = require('../models/ProjectAssignment');
-const DeveloperSkill = require('../models/DeveloperSkill');
+const { sequelize, Project, Developer, ProjectAssignment, DeveloperSkill } = require('../models');
 
 // 프로젝트 목록 조회
 exports.getProjects = async (req, res) => {
