@@ -35,7 +35,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           p: '2px 4px',
           display: 'flex',
           alignItems: 'center',
-          flex: 2,
+          flex: 2.05,
           minWidth: '200px',
         }}
       >
@@ -57,6 +57,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           label="직급"
           onChange={(e) => handleChange('position', e.target.value)}
           displayEmpty
+          sx={{ height: '48px' }}
         >
           <MenuItem value="">전체</MenuItem>
           {positions.map((position) => (
@@ -74,6 +75,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           label="등급"
           onChange={(e) => handleChange('grade', e.target.value)}
           displayEmpty
+          sx={{ height: '48px' }}
         >
           <MenuItem value="">전체</MenuItem>
           {grades.map((grade) => (

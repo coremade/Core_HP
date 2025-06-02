@@ -52,12 +52,13 @@ const marriedOptions = [
 const emptyDeveloper: Partial<Developer> = {
   developer_name: '',
   developer_birth: '',
-  developer_sex: '',
+  developer_sex: 'M',
   developer_email: '',
   developer_phone: '',
   developer_addr: '',
-  developer_current_position: '',
-  developer_grade: '',
+  developer_current_position: '사원',
+  developer_grade: '초급',
+  developer_married: 'N',
 };
 
 export default function DeveloperDetailForm({ 
@@ -397,12 +398,13 @@ export default function DeveloperDetailForm({
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required disabled={!isEditing && !isCreating}>
+              <FormControl fullWidth required disabled={!isEditing && !isCreating} sx={{ minWidth: '100%' }}>
                 <InputLabel>직급</InputLabel>
                 <Select
                   value={formData.developer_current_position || ''}
                   onChange={(e) => setFormData({ ...formData, developer_current_position: e.target.value })}
                   label="직급"
+                  sx={{ height: '56px' }}
                 >
                   {positions.map((position) => (
                     <MenuItem key={position} value={position}>
@@ -414,12 +416,13 @@ export default function DeveloperDetailForm({
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <FormControl fullWidth required disabled={!isEditing && !isCreating}>
+              <FormControl fullWidth required disabled={!isEditing && !isCreating} sx={{ minWidth: '100%' }}>
                 <InputLabel>등급</InputLabel>
                 <Select
                   value={formData.developer_grade || ''}
                   onChange={(e) => setFormData({ ...formData, developer_grade: e.target.value })}
                   label="등급"
+                  sx={{ height: '56px' }}
                 >
                   {grades.map((grade) => (
                     <MenuItem key={grade} value={grade}>
