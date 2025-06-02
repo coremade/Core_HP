@@ -1,26 +1,30 @@
 import { useState, useCallback } from 'react';
-import { Developer, DeveloperCreateInput, DeveloperUpdateInput } from '@/types/developer';
-import { developerApi } from '@/api/developer';
+import { Developer } from '@/types/developer';
+import { developerApi, DeveloperQueryParams, DeveloperListResponse } from '@/api/developer';
 
 export const useDeveloper = () => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDevelopers = useCallback(async () => {
+  const fetchDevelopers = useCallback(async (params: DeveloperQueryParams = {}) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await developerApi.getAllDevelopers();
-      setDevelopers(data);
+      const response = await developerApi.getAllDevelopers(params);
+      setDevelopers(response.developers);
+      setTotal(response.total);
+      return response;
     } catch (err) {
       setError(err instanceof Error ? err.message : '개발자 목록을 불러오는데 실패했습니다.');
+      throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const createDeveloper = useCallback(async (data: DeveloperCreateInput) => {
+  const createDeveloper = useCallback(async (data: any) => {
     try {
       setLoading(true);
       setError(null);
@@ -35,7 +39,7 @@ export const useDeveloper = () => {
     }
   }, []);
 
-  const updateDeveloper = useCallback(async (data: DeveloperUpdateInput) => {
+  const updateDeveloper = useCallback(async (data: any) => {
     try {
       setLoading(true);
       setError(null);
@@ -68,6 +72,7 @@ export const useDeveloper = () => {
 
   return {
     developers,
+    total,
     loading,
     error,
     fetchDevelopers,

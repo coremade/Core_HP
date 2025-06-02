@@ -1,5 +1,60 @@
 const express = require("express");
 const router = express.Router();
+const { MasterCode, DetailCode } = require("../models");
+
+// 마스터 코드 목록 조회
+router.get("/master", async (req, res) => {
+  try {
+    const masterCodes = await MasterCode.findAll({
+      order: [['master_name', 'ASC']]
+    });
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.status(200).json(masterCodes);
+  } catch (error) {
+    console.error('마스터 코드 조회 실패:', error);
+    res.status(500).json({ message: '마스터 코드 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// 상세 코드 목록 조회
+router.get("/detail", async (req, res) => {
+  try {
+    const { master_id } = req.query;
+    if (!master_id) {
+      return res.status(400).json({ message: "master_id is required" });
+    }
+
+    const detailCodes = await DetailCode.findAll({
+      where: { master_id },
+      order: [['sort_order', 'ASC']]
+    });
+    res.status(200).json(detailCodes);
+  } catch (error) {
+    console.error('상세 코드 조회 실패:', error);
+    res.status(500).json({ message: '상세 코드 조회 중 오류가 발생했습니다.' });
+  }
+});
+
+// 상세 코드 목록 조회 (마스터코드별)
+router.get("/detail/:masterId", async (req, res) => {
+  try {
+    const { masterId } = req.params;
+    const detailCodes = await DetailCode.findAll({
+      where: {
+        master_id: masterId
+      },
+      order: [['sort_order', 'ASC']]
+    });
+    res.status(200).json(detailCodes);
+  } catch (error) {
+    console.error('상세 코드 조회 실패:', error);
+    res.status(500).json({ message: '상세 코드 조회 중 오류가 발생했습니다.' });
+  }
+});
 
 // 공통 코드 목록 조회
 router.get("/", (req, res) => {
@@ -35,6 +90,98 @@ router.put("/:id", (req, res) => {
 // 공통 코드 삭제
 router.delete("/:id", (req, res) => {
   res.status(200).json({ message: "공통 코드 삭제 성공" });
+});
+
+// 마스터 코드 추가
+router.post("/master", async (req, res) => {
+  try {
+    const masterCode = await MasterCode.create(req.body);
+    res.status(201).json(masterCode);
+  } catch (error) {
+    console.error('마스터 코드 생성 실패:', error);
+    res.status(500).json({ message: '마스터 코드 생성 중 오류가 발생했습니다.' });
+  }
+});
+
+// 마스터 코드 수정
+router.put("/master/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [updated] = await MasterCode.update(req.body, {
+      where: { master_id: id }
+    });
+    if (updated) {
+      const updatedCode = await MasterCode.findByPk(id);
+      res.status(200).json(updatedCode);
+    } else {
+      res.status(404).json({ message: '마스터 코드를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('마스터 코드 수정 실패:', error);
+    res.status(500).json({ message: '마스터 코드 수정 중 오류가 발생했습니다.' });
+  }
+});
+
+// 마스터 코드 삭제 (실제 DB 삭제)
+router.delete("/master/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await MasterCode.destroy({ where: { master_id: id } });
+    if (deleted) {
+      res.status(200).json({ message: '마스터 코드가 삭제되었습니다.' });
+    } else {
+      res.status(404).json({ message: '마스터 코드를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('마스터 코드 삭제 실패:', error);
+    res.status(500).json({ message: '마스터 코드 삭제 중 오류가 발생했습니다.' });
+  }
+});
+
+// 상세 코드 추가
+router.post("/detail", async (req, res) => {
+  try {
+    const detailCode = await DetailCode.create(req.body);
+    res.status(201).json(detailCode);
+  } catch (error) {
+    console.error('상세 코드 생성 실패:', error);
+    res.status(500).json({ message: '상세 코드 생성 중 오류가 발생했습니다.' });
+  }
+});
+
+// 상세 코드 수정
+router.put("/detail/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [updated] = await DetailCode.update(req.body, {
+      where: { detail_id: id }
+    });
+    if (updated) {
+      const updatedCode = await DetailCode.findByPk(id);
+      res.status(200).json(updatedCode);
+    } else {
+      res.status(404).json({ message: '상세 코드를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('상세 코드 수정 실패:', error);
+    res.status(500).json({ message: '상세 코드 수정 중 오류가 발생했습니다.' });
+  }
+});
+
+// 상세 코드 삭제 (실제 DB 삭제)
+router.delete("/detail/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await DetailCode.destroy({ where: { detail_id: id } });
+    if (deleted) {
+      res.status(200).json({ message: '상세 코드가 삭제되었습니다.' });
+    } else {
+      res.status(404).json({ message: '상세 코드를 찾을 수 없습니다.' });
+    }
+  } catch (error) {
+    console.error('상세 코드 삭제 실패:', error);
+    res.status(500).json({ message: '상세 코드 삭제 중 오류가 발생했습니다.' });
+  }
 });
 
 module.exports = router;

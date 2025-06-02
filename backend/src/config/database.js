@@ -1,12 +1,12 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const sequelize = new Sequelize({
-  host: process.env.DB_HOST || '192.168.0.7',
-  port: process.env.DB_PORT || 3306,
+const config = {
   database: process.env.DB_NAME || 'dev_management',
   username: process.env.DB_USER || 'devuser',
   password: process.env.DB_PASSWORD || 'devpass',
+  host: process.env.DB_HOST || '192.168.0.7',
+  port: process.env.DB_PORT || 3306,
   dialect: 'mysql',
   pool: {
     max: 5,
@@ -15,6 +15,13 @@ const sequelize = new Sequelize({
     idle: 10000
   },
   logging: console.log
-});
+};
+
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config
+);
 
 module.exports = sequelize; 

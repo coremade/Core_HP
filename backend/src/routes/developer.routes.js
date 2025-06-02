@@ -32,7 +32,7 @@ router.get("/:id", developerController.getDeveloperById);
 // 개발자 정보 수정
 router.put("/:id", developerController.updateDeveloper);
 
-// 개발자 삭제
-router.delete("/:id", developerController.deleteDeveloper);
+// 개발자 삭제 (단일 또는 다중)
+router.delete("/", developerController.deleteDevelopers);
 
 module.exports = router;
