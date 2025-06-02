@@ -25,8 +25,24 @@ WHERE
         WHEN ? != '' THEN -- 검색어가 있는 경우
             developer_name LIKE CONCAT('%', ?, '%')
             OR developer_email LIKE CONCAT('%', ?, '%')
+            OR developer_phone LIKE CONCAT('%', ?, '%')
             OR developer_current_position LIKE CONCAT('%', ?, '%')
         ELSE TRUE -- 검색어가 없는 경우 모든 레코드 반환
+    END
+    AND CASE
+        WHEN ? != '' THEN -- 성별 필터가 있는 경우
+            developer_sex = ?
+        ELSE TRUE -- 성별 필터가 없는 경우 모든 레코드 반환
+    END
+    AND CASE
+        WHEN ? != '' THEN -- 직급 필터가 있는 경우
+            developer_current_position = ?
+        ELSE TRUE -- 직급 필터가 없는 경우 모든 레코드 반환
+    END
+    AND CASE
+        WHEN ? != '' THEN -- 등급 필터가 있는 경우
+            developer_grade = ?
+        ELSE TRUE -- 등급 필터가 없는 경우 모든 레코드 반환
     END
 ORDER BY developer_id DESC, created_at DESC
 LIMIT ? OFFSET ?;
@@ -39,7 +55,13 @@ WHERE
         WHEN ? != '' THEN
             developer_name LIKE CONCAT('%', ?, '%')
             OR developer_email LIKE CONCAT('%', ?, '%')
+            OR developer_phone LIKE CONCAT('%', ?, '%')
             OR developer_current_position LIKE CONCAT('%', ?, '%')
+        ELSE TRUE
+    END
+    AND CASE
+        WHEN ? != '' THEN
+            developer_sex = ?
         ELSE TRUE
     END;
 

@@ -18,6 +18,9 @@ export interface DeveloperQueryParams {
   page?: number;
   pageSize?: number;
   searchKeyword?: string;
+  gender?: string;
+  position?: string;
+  grade?: string;
 }
 
 export const developerApi = {
@@ -29,6 +32,9 @@ export const developerApi = {
           page: params.page || 1,
           pageSize: params.pageSize || 10,
           searchKeyword: params.searchKeyword || '',
+          gender: params.gender || '',
+          position: params.position || '',
+          grade: params.grade || ''
         },
       });
       console.log('Received response:', response.data);
