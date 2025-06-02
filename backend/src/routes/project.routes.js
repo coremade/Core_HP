@@ -1,54 +1,40 @@
 const express = require("express");
 const router = express.Router();
+const projectController = require('../controllers/project.controller');
+
+// 모든 요청에 대한 로깅 미들웨어
+router.use((req, res, next) => {
+  console.log('Project Routes - 요청 발생:', {
+    method: req.method,
+    path: req.path,
+    query: req.query,
+    body: req.body
+  });
+  next();
+});
 
 // 프로젝트 목록 조회
-router.get("/", (req, res) => {
-  res.status(200).json([
-    {
-      id: 1,
-      name: "프로젝트 A",
-      status: "진행중",
-      startDate: "2024-03-01",
-      endDate: "2024-06-30",
-    },
-  ]);
-});
+router.get("/", projectController.getProjects);
+
+// 개발자 검색 (구체적인 경로를 먼저 배치)
+router.get("/developers", projectController.searchDevelopers);
 
 // 프로젝트 상세 조회
-router.get("/:id", (req, res) => {
-  res.status(200).json({
-    id: 1,
-    name: "프로젝트 A",
-    status: "진행중",
-    startDate: "2024-03-01",
-    endDate: "2024-06-30",
-    description: "프로젝트 상세 설명",
-  });
-});
+router.get("/:id", projectController.getProjectById);
 
 // 프로젝트 생성
-router.post("/", (req, res) => {
-  res.status(201).json({ message: "프로젝트 생성 성공" });
-});
+router.post("/", projectController.createProject);
 
 // 프로젝트 수정
-router.put("/:id", (req, res) => {
-  res.status(200).json({ message: "프로젝트 수정 성공" });
-});
+router.put("/:id", projectController.updateProject);
 
 // 프로젝트 삭제
-router.delete("/:id", (req, res) => {
-  res.status(200).json({ message: "프로젝트 삭제 성공" });
-});
+router.delete("/:id", projectController.deleteProject);
 
 // 프로젝트 개발자 배정
-router.post("/:id/assignments", (req, res) => {
-  res.status(200).json({ message: "개발자 배정 성공" });
-});
+router.post("/:id/assignments", projectController.assignDeveloper);
 
 // 프로젝트 개발자 목록 조회
-router.get("/:id/developers", (req, res) => {
-  res.status(200).json([{ id: 1, name: "홍길동", role: "백엔드 개발자" }]);
-});
+router.get("/:id/developers", projectController.getProjectDevelopers);
 
 module.exports = router;
