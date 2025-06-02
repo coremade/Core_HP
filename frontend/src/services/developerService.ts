@@ -51,16 +51,22 @@ export interface DeveloperQueryParams {
   page: number;
   pageSize: number;
   searchKeyword?: string;
+  gender?: string;
+  position?: string;
+  grade?: string;
 }
 
 export const developerService = {
   // 개발자 목록 조회
-  async getDevelopers({ page, pageSize, searchKeyword }: DeveloperQueryParams): Promise<DeveloperListResponse> {
+  async getDevelopers({ page, pageSize, searchKeyword, gender, position, grade }: DeveloperQueryParams): Promise<DeveloperListResponse> {
     const response = await axios.get(API_BASE_URL, {
       params: {
         page,
         pageSize,
         searchKeyword,
+        gender,
+        position,
+        grade,
       },
     });
     return response.data;

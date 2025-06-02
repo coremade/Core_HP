@@ -7,12 +7,18 @@ exports.getAllDevelopers = async (req, res, next) => {
     console.log('요청 파라미터:', {
       page: req.query.page,
       pageSize: req.query.pageSize,
-      searchKeyword: req.query.searchKeyword
+      searchKeyword: req.query.searchKeyword,
+      gender: req.query.gender,
+      position: req.query.position,
+      grade: req.query.grade
     });
 
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const searchKeyword = req.query.searchKeyword || '';
+    const gender = req.query.gender || '';
+    const position = req.query.position || '';
+    const grade = req.query.grade || '';
     const offset = (page - 1) * pageSize;
 
     const where = {};
@@ -20,9 +26,27 @@ exports.getAllDevelopers = async (req, res, next) => {
       where[Op.or] = [
         { developer_name: { [Op.like]: `%${searchKeyword}%` } },
         { developer_email: { [Op.like]: `%${searchKeyword}%` } },
-        { developer_current_position: { [Op.like]: `%${searchKeyword}%` } }
+        { developer_phone: { [Op.like]: `%${searchKeyword}%` } }
       ];
       console.log('검색 조건:', where);
+    }
+
+    // 성별 검색 조건 추가
+    if (gender) {
+      where.developer_sex = gender;
+      console.log('성별 검색 조건:', gender);
+    }
+
+    // 직급 검색 조건 추가
+    if (position) {
+      where.developer_current_position = position;
+      console.log('직급 검색 조건:', position);
+    }
+
+    // 등급 검색 조건 추가
+    if (grade) {
+      where.developer_grade = grade;
+      console.log('등급 검색 조건:', grade);
     }
 
     const { count, rows: developers } = await Developer.findAndCountAll({

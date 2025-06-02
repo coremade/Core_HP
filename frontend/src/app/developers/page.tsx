@@ -14,6 +14,9 @@ export default function DevelopersPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [gender, setGender] = useState('');
+  const [position, setPosition] = useState('');
+  const [grade, setGrade] = useState('');
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -22,8 +25,8 @@ export default function DevelopersPage() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['developers', page, pageSize, searchKeyword],
-    queryFn: () => developerService.getDevelopers({ page, pageSize, searchKeyword }),
+    queryKey: ['developers', page, pageSize, searchKeyword, gender, position, grade],
+    queryFn: () => developerService.getDevelopers({ page, pageSize, searchKeyword, gender, position, grade }),
   });
 
   const createMutation = useMutation({
@@ -66,10 +69,10 @@ export default function DevelopersPage() {
   });
 
   const handleSearch = (filters: SearchFilters) => {
-    const keyword = Object.values(filters)
-      .filter(value => value)
-      .join(' ');
-    setSearchKeyword(keyword);
+    setSearchKeyword(filters.searchKeyword || '');
+    setGender(filters.gender || '');
+    setPosition(filters.position || '');
+    setGrade(filters.grade || '');
     setPage(1);
   };
 
