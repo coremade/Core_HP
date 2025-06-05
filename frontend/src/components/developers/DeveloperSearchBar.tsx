@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Paper, InputBase, IconButton, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Box, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
 
 interface DeveloperSearchBarProps {
   onSearch: (filters: SearchFilters) => void;
 }
 
 export interface SearchFilters {
-  searchKeyword?: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  skills?: string;
   position?: string;
   grade?: string;
   gender?: string;
@@ -22,7 +24,10 @@ const genders = [
 
 export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps) {
   const [filters, setFilters] = useState<SearchFilters>({
-    searchKeyword: '',
+    name: '',
+    phone: '',
+    email: '',
+    skills: '',
     position: '',
     grade: '',
     gender: '',
@@ -35,29 +40,51 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
   };
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', gap: 6}}>
-      <Box sx={{ width: '100%', display: 'flex', gap: 3 }}>
-        <Paper
-          sx={{
-            p: '2px 4px',
-            display: 'flex',
-            alignItems: 'center',
-            flex: '0 0 50%',
-            minWidth: '200px',
-          }}
-        >
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="이름, 전화번호, 이메일로 검색"
-            value={filters.searchKeyword || ''}
-            onChange={(e) => handleChange('searchKeyword', e.target.value)}
-          />
-          <IconButton type="button" sx={{ p: '10px' }}>
-            <SearchIcon />
-          </IconButton>
-        </Paper>
-        
-        <FormControl sx={{ flex: '0 0 50%', minWidth: '150px' }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ width: '100%', display: 'flex', gap: 2 }}>
+        <TextField
+          size="small"
+          label="이름"
+          InputLabelProps={{ shrink: true }}
+          placeholder="이름으로 검색"
+          value={filters.name || ''}
+          onChange={(e) => handleChange('name', e.target.value)}
+          sx={{ flex: 1 }}
+        />
+
+        <TextField
+          size="small"
+          label="전화번호"
+          InputLabelProps={{ shrink: true }}
+          placeholder="전화번호로 검색"
+          value={filters.phone || ''}
+          onChange={(e) => handleChange('phone', e.target.value)}
+          sx={{ flex: 1 }}
+        />
+
+        <TextField
+          size="small"
+          label="이메일"
+          InputLabelProps={{ shrink: true }}
+          placeholder="이메일로 검색"
+          value={filters.email || ''}
+          onChange={(e) => handleChange('email', e.target.value)}
+          sx={{ flex: 1 }}
+        />
+
+        <TextField
+          size="small"
+          label="기술"
+          InputLabelProps={{ shrink: true }}
+          placeholder="기술로 검색"
+          value={filters.skills || ''}
+          onChange={(e) => handleChange('skills', e.target.value)}
+          sx={{ flex: 1 }}
+        />
+      </Box>
+
+      <Box sx={{ width: '100%', display: 'flex', gap: 2 }}>
+        <FormControl size="small" sx={{ flex: 1 }}>
           <InputLabel shrink>성별</InputLabel>
           <Select
             value={filters.gender || ''}
@@ -73,10 +100,8 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
             ))}
           </Select>
         </FormControl>
-      </Box>
 
-      <Box sx={{ width: '100%', display: 'flex', gap: 3 }}>
-        <FormControl sx={{ flex: '0 0 50%', minWidth: '150px' }}>
+        <FormControl size="small" sx={{ flex: 1 }}>
           <InputLabel shrink>직급</InputLabel>
           <Select
             value={filters.position || ''}
@@ -93,7 +118,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           </Select>
         </FormControl>
 
-        <FormControl sx={{ flex: '0 0 50%', minWidth: '150px' }}>
+        <FormControl size="small" sx={{ flex: 1 }}>
           <InputLabel shrink>등급</InputLabel>
           <Select
             value={filters.grade || ''}
