@@ -52,6 +52,7 @@ CREATE TABLE school_info (
     developer_id VARCHAR(36) NOT NULL COMMENT '개발자 ID',
     school_graduation_ym VARCHAR(6) NOT NULL COMMENT '졸업년월',
     school_name VARCHAR(100) NOT NULL COMMENT '학교명',
+    school_major VARCHAR(100) COMMENT '전공',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
     PRIMARY KEY (developer_id, school_graduation_ym),

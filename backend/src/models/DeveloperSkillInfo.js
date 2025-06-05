@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const DeveloperSkill = sequelize.define('DeveloperSkill', {
+  const DeveloperSkillInfo = sequelize.define('DeveloperSkillInfo', {
     developer_id: {
-      type: DataTypes.STRING(36),
+      type: DataTypes.DECIMAL(10,0),
       allowNull: false,
       primaryKey: true,
       references: {
@@ -16,8 +16,32 @@ module.exports = (sequelize) => {
       allowNull: false,
       primaryKey: true
     },
+    project_name: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    project_practitioner_id: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    project_client_id: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
     task: {
       type: DataTypes.STRING(50),
+      allowNull: true
+    },
+    project_end_ym: {
+      type: DataTypes.STRING(6),
+      allowNull: true
+    },
+    project_skill_model: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    project_skill_os: {
+      type: DataTypes.STRING(100),
       allowNull: true
     },
     project_skill_language: {
@@ -39,6 +63,14 @@ module.exports = (sequelize) => {
     project_skill_etc: {
       type: DataTypes.STRING(100),
       allowNull: true
+    },
+    project_month: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    project_id: {
+      type: DataTypes.STRING(36),
+      allowNull: true
     }
   }, {
     tableName: 'developer_skill_info',
@@ -47,5 +79,5 @@ module.exports = (sequelize) => {
     updatedAt: 'updated_at'
   });
 
-  return DeveloperSkill;
+  return DeveloperSkillInfo;
 }; 

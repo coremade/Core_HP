@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+const path = require("path");
 const { sequelize } = require("./models");
 const developerRoutes = require("./routes/developer.routes");
 const resumeRoutes = require("./routes/resume.routes");
@@ -20,11 +21,15 @@ app.use(cors({
 }));
 
 // 미들웨어 설정
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 정적 파일 제공
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // 요청 로깅 미들웨어
 app.use((req, res, next) => {
@@ -49,8 +54,7 @@ app.use("/api/developers", developerRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/projects", projectRoutes);
-app.use("/api/common-codes", codeRoutes);
-
+app.use("/api/codes", codeRoutes);
 
 // 데이터베이스 연결 및 서버 시작
 sequelize

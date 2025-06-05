@@ -1,7 +1,7 @@
 
 CREATE TABLE certification_info
 (
-  developer_id       VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id       DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   certification_date DATE         NULL     COMMENT '취득년월',
   created_at         DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at         DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
@@ -38,7 +38,7 @@ CREATE TABLE common_code_master
 
 CREATE TABLE developer_info
 (
-  developer_id                  VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id                  DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   created_at                    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at                    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
   developer_name                VARCHAR(100) NOT NULL COMMENT '이름',
@@ -65,7 +65,7 @@ ALTER TABLE developer_info
 
 CREATE TABLE developer_skill_info
 (
-  developer_id            VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id            DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   project_start_ym        VARCHAR(6)   NOT NULL COMMENT '시작년월',
   created_at              DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at              DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
@@ -89,7 +89,7 @@ CREATE TABLE developer_skill_info
 CREATE TABLE project_assignment_info
 (
   project_id   VARCHAR(36) NOT NULL COMMENT '프로젝트 ID',
-  developer_id VARCHAR(36) NULL     COMMENT '개발자 ID',
+  developer_id DECIMAL(10,0) NULL     COMMENT '개발자 ID',
   created_at   DATETIME    NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at   DATETIME    NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
   role         VARCHAR(50) NULL     COMMENT '역할',
@@ -124,7 +124,7 @@ CREATE TABLE project_info
 
 CREATE TABLE resume
 (
-  developer_id VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   created_at   DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at   DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
   developer_id VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
@@ -138,7 +138,7 @@ CREATE TABLE resume
 
 CREATE TABLE school_info
 (
-  developer_id         VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id         DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   school_graduation_ym VARCHAR(6)   NULL     COMMENT '졸업년월',
   created_at           DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at           DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
@@ -148,7 +148,7 @@ CREATE TABLE school_info
 
 CREATE TABLE work_info
 (
-  developer_id  VARCHAR(36)  NOT NULL COMMENT '개발자 ID',
+  developer_id  DECIMAL(10,0)  NOT NULL COMMENT '개발자 ID',
   work_start_ym VARCHAR(6)   NULL     COMMENT '시작년월',
   created_at    DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
   updated_at    DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
