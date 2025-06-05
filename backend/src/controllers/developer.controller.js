@@ -1,66 +1,117 @@
-const { Developer } = require("../models");
+const { Developer, DeveloperSkillInfo } = require("../models");
 const { Op } = require("sequelize");
 
 exports.getAllDevelopers = async (req, res, next) => {
   try {
     console.log('\n=== 개발자 목록 조회 시작 ===');
-    console.log('요청 파라미터:', {
-      page: req.query.page,
-      pageSize: req.query.pageSize,
-      searchKeyword: req.query.searchKeyword,
-      gender: req.query.gender,
-      position: req.query.position,
-      grade: req.query.grade
-    });
+    console.log('요청 파라미터:', req.query);
 
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
-    const searchKeyword = req.query.searchKeyword || '';
+    const name = req.query.name || '';
+    const email = req.query.email || '';
+    const phone = req.query.phone || '';
+    const skills = req.query.skills || '';
     const gender = req.query.gender || '';
     const position = req.query.position || '';
     const grade = req.query.grade || '';
     const offset = (page - 1) * pageSize;
 
     const where = {};
-    if (searchKeyword) {
-      where[Op.or] = [
-        { developer_name: { [Op.like]: `%${searchKeyword}%` } },
-        { developer_email: { [Op.like]: `%${searchKeyword}%` } },
-        { developer_phone: { [Op.like]: `%${searchKeyword}%` } }
-      ];
-      console.log('검색 조건:', where);
+    const include = [];
+
+    // 이름 검색
+    if (name) {
+      where.developer_name = { [Op.like]: `%${name}%` };
     }
 
-    // 성별 검색 조건 추가
+    // 이메일 검색
+    if (email) {
+      where.developer_email = { [Op.like]: `%${email}%` };
+    }
+
+    // 전화번호 검색
+    if (phone) {
+      where.developer_phone = { [Op.like]: `%${phone}%` };
+    }
+
+    // 기술 검색 (콤마로 구분된 여러 기술 검색 지원)
+    if (skills) {
+      const skillList = skills.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
+      
+      if (skillList.length > 0) {
+        include.push({
+          model: DeveloperSkillInfo,
+          required: true,
+          where: {
+            [Op.and]: skillList.map(skill => ({
+              [Op.or]: [
+                { project_skill_model: { [Op.like]: `%${skill}%` } },
+                { project_skill_os: { [Op.like]: `%${skill}%` } },
+                { project_skill_language: { [Op.like]: `%${skill}%` } },
+                { project_skill_dbms: { [Op.like]: `%${skill}%` } },
+                { project_skill_tool: { [Op.like]: `%${skill}%` } },
+                { project_skill_protocol: { [Op.like]: `%${skill}%` } },
+                { project_skill_etc: { [Op.like]: `%${skill}%` } }
+              ]
+            }))
+          },
+          attributes: [
+            'project_skill_model',
+            'project_skill_os',
+            'project_skill_language',
+            'project_skill_dbms',
+            'project_skill_tool',
+            'project_skill_protocol',
+            'project_skill_etc'
+          ]
+        });
+      }
+    }
+
+    // 성별 검색 조건
     if (gender) {
       where.developer_sex = gender;
-      console.log('성별 검색 조건:', gender);
     }
 
-    // 직급 검색 조건 추가
+    // 직급 검색 조건
     if (position) {
       where.developer_current_position = position;
-      console.log('직급 검색 조건:', position);
     }
 
-    // 등급 검색 조건 추가
+    // 등급 검색 조건
     if (grade) {
       where.developer_grade = grade;
-      console.log('등급 검색 조건:', grade);
     }
 
     const { count, rows: developers } = await Developer.findAndCountAll({
       where,
+      include,
+      distinct: true,
       order: [["developer_id", "DESC"]],
       offset,
-      limit: pageSize
-    });
-
-    console.log(`총 개발자 수: ${count}`);
-    console.log(`현재 페이지 개발자 수: ${developers.length}`);
-    console.log('조회된 개발자 목록:');
-    developers.forEach((dev, index) => {
-      console.log(`${index + 1}. ${dev.developer_name} (${dev.developer_email}) - ${dev.developer_current_position}`);
+      limit: pageSize,
+      attributes: [
+        'developer_id',
+        'developer_name',
+        'developer_birth',
+        'developer_sex',
+        'developer_email',
+        'developer_phone',
+        'developer_addr',
+        'developer_profile_image',
+        'developer_start_date',
+        'developer_career_start_date',
+        'developer_current_position',
+        'developer_grade',
+        'developer_married',
+        'developer_military_start_date',
+        'developer_military_end_date',
+        'developer_military_desc',
+        'developer_evaluation_code',
+        'created_at',
+        'updated_at'
+      ]
     });
 
     const response = {
