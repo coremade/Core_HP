@@ -10,6 +10,7 @@ export interface SearchFilters {
   phone?: string;
   email?: string;
   skills?: string;
+  excludeSkills?: string;
   position?: string;
   grade?: string;
   gender?: string;
@@ -28,6 +29,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
     phone: '',
     email: '',
     skills: '',
+    excludeSkills: '',
     position: '',
     grade: '',
     gender: '',
@@ -84,6 +86,16 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
       </Box>
 
       <Box sx={{ width: '100%', display: 'flex', gap: 2 }}>
+        <TextField
+          size="small"
+          label="제외 기술"
+          InputLabelProps={{ shrink: true }}
+          placeholder="제외할 기술로 검색"
+          value={filters.excludeSkills || ''}
+          onChange={(e) => handleChange('excludeSkills', e.target.value)}
+          sx={{ flex: 1 }}
+        />
+
         <FormControl size="small" sx={{ flex: 1 }}>
           <InputLabel shrink>성별</InputLabel>
           <Select

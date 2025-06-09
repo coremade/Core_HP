@@ -9,6 +9,7 @@ interface DeveloperQueryParams {
   email?: string;
   phone?: string;
   skills?: string;
+  excludeSkills?: string;
   gender?: string;
   position?: string;
   grade?: string;
@@ -72,6 +73,7 @@ export const developerService = {
     if (params.email) queryParams.append('email', params.email);
     if (params.phone) queryParams.append('phone', params.phone);
     if (params.skills) queryParams.append('skills', params.skills);
+    if (params.excludeSkills) queryParams.append('excludeSkills', params.excludeSkills);
     if (params.gender) queryParams.append('gender', params.gender);
     if (params.position) queryParams.append('position', params.position);
     if (params.grade) queryParams.append('grade', params.grade);

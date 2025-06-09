@@ -17,6 +17,7 @@ export default function DevelopersPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [skills, setSkills] = useState('');
+  const [excludeSkills, setExcludeSkills] = useState('');
   const [gender, setGender] = useState('');
   const [position, setPosition] = useState('');
   const [grade, setGrade] = useState('');
@@ -32,6 +33,7 @@ export default function DevelopersPage() {
     setEmail(filters.email || '');
     setPhone(filters.phone || '');
     setSkills(filters.skills || '');
+    setExcludeSkills(filters.excludeSkills || '');
     setGender(filters.gender || '');
     setPosition(filters.position || '');
     setGrade(filters.grade || '');
@@ -39,7 +41,7 @@ export default function DevelopersPage() {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['developers', page, pageSize, name, email, phone, skills, gender, position, grade],
+    queryKey: ['developers', page, pageSize, name, email, phone, skills, excludeSkills, gender, position, grade],
     queryFn: () => developerService.getDevelopers({ 
       page, 
       pageSize, 
@@ -47,6 +49,7 @@ export default function DevelopersPage() {
       email,
       phone,
       skills,
+      excludeSkills,
       gender, 
       position, 
       grade 
