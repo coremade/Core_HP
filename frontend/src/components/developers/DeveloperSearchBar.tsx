@@ -78,7 +78,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           size="small"
           label="기술"
           InputLabelProps={{ shrink: true }}
-          placeholder="기술로 검색"
+          placeholder="기술로 검색 (콤마로 구분)"
           value={filters.skills || ''}
           onChange={(e) => handleChange('skills', e.target.value)}
           sx={{ flex: 1 }}
@@ -90,7 +90,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
           size="small"
           label="제외 기술"
           InputLabelProps={{ shrink: true }}
-          placeholder="제외할 기술로 검색"
+          placeholder="제외할 기술로 검색 (콤마로 구분)"
           value={filters.excludeSkills || ''}
           onChange={(e) => handleChange('excludeSkills', e.target.value)}
           sx={{ flex: 1 }}
