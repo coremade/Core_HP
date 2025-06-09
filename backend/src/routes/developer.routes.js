@@ -74,46 +74,76 @@ router.get("/", async (req, res) => {
 
       // 제외 기술 검색 조건 - 해당 기술을 가지지 않은 개발자 찾기
       if (excludeSkills) {
-        const excludeSkillDeveloperIds = await DeveloperSkillInfo.findAll({
-          where: {
-            [Op.or]: [
-              { project_skill_model: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_os: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_language: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_dbms: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_tool: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_protocol: { [Op.like]: `%${excludeSkills}%` } },
-              { project_skill_etc: { [Op.like]: `%${excludeSkills}%` } }
-            ]
-          },
-          attributes: ['developer_id'],
-          raw: true
-        });
+        // 콤마로 구분된 제외 기술들을 배열로 분리 (공백 완전 제거)
+        const excludeSkillsArray = excludeSkills
+          .split(',')
+          .map(skill => skill.trim().replace(/\s+/g, ' ')) // 연속된 공백을 하나로 변환
+          .filter(skill => skill && skill.length > 0);
         
-        const excludeIds = excludeSkillDeveloperIds.map(item => item.developer_id);
-        if (excludeIds.length > 0) {
-          whereCondition.developer_id = { [Op.notIn]: excludeIds };
+        console.log('제외 기술 배열:', excludeSkillsArray);
+        
+        if (excludeSkillsArray.length > 0) {
+          // 각 기술에 대한 OR 조건 생성
+          const excludeSkillConditions = excludeSkillsArray.map(skill => ({
+            [Op.or]: [
+              { project_skill_model: { [Op.like]: `%${skill}%` } },
+              { project_skill_os: { [Op.like]: `%${skill}%` } },
+              { project_skill_language: { [Op.like]: `%${skill}%` } },
+              { project_skill_dbms: { [Op.like]: `%${skill}%` } },
+              { project_skill_tool: { [Op.like]: `%${skill}%` } },
+              { project_skill_protocol: { [Op.like]: `%${skill}%` } },
+              { project_skill_etc: { [Op.like]: `%${skill}%` } }
+            ]
+          }));
+
+          const excludeSkillDeveloperIds = await DeveloperSkillInfo.findAll({
+            where: {
+              [Op.and]: excludeSkillConditions // OR로 수정: 어떤 제외 기술이라도 가진 개발자
+            },
+            attributes: ['developer_id'],
+            raw: true
+          });
+          
+          const excludeIds = excludeSkillDeveloperIds.map(item => item.developer_id);
+          if (excludeIds.length > 0) {
+            whereCondition.developer_id = { [Op.notIn]: excludeIds };
+          }
         }
       }
 
       // 포함 기술 검색 조건
       let includeConditions = [];
       if (skills) {
-        includeConditions.push({
-          model: DeveloperSkillInfo,
-          where: {
+        // 콤마로 구분된 기술들을 배열로 분리 (공백 완전 제거)
+        const skillsArray = skills
+          .split(',')
+          .map(skill => skill.trim().replace(/\s+/g, ' ')) // 연속된 공백을 하나로 변환
+          .filter(skill => skill && skill.length > 0);
+        
+        console.log('포함 기술 배열:', skillsArray);
+        
+        if (skillsArray.length > 0) {
+          // 각 기술에 대한 OR 조건 생성
+          const skillConditions = skillsArray.map(skill => ({
             [Op.or]: [
-              { project_skill_model: { [Op.like]: `%${skills}%` } },
-              { project_skill_os: { [Op.like]: `%${skills}%` } },
-              { project_skill_language: { [Op.like]: `%${skills}%` } },
-              { project_skill_dbms: { [Op.like]: `%${skills}%` } },
-              { project_skill_tool: { [Op.like]: `%${skills}%` } },
-              { project_skill_protocol: { [Op.like]: `%${skills}%` } },
-              { project_skill_etc: { [Op.like]: `%${skills}%` } }
+              { project_skill_model: { [Op.like]: `%${skill}%` } },
+              { project_skill_os: { [Op.like]: `%${skill}%` } },
+              { project_skill_language: { [Op.like]: `%${skill}%` } },
+              { project_skill_dbms: { [Op.like]: `%${skill}%` } },
+              { project_skill_tool: { [Op.like]: `%${skill}%` } },
+              { project_skill_protocol: { [Op.like]: `%${skill}%` } },
+              { project_skill_etc: { [Op.like]: `%${skill}%` } }
             ]
-          },
-          required: true // INNER JOIN
-        });
+          }));
+
+          includeConditions.push({
+            model: DeveloperSkillInfo,
+            where: {
+              [Op.and]: skillConditions // OR로 수정: 어떤 기술이라도 가진 개발자
+            },
+            required: true // INNER JOIN
+          });
+        }
       }
 
       const queryOptions = {
