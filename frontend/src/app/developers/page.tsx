@@ -15,15 +15,13 @@ export default function DevelopersPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [skills, setSkills] = useState('');
   const [excludeSkills, setExcludeSkills] = useState('');
   const [skillsCondition, setSkillsCondition] = useState('OR');
   const [excludeSkillsCondition, setExcludeSkillsCondition] = useState('OR');
-  const [gender, setGender] = useState('');
-  const [position, setPosition] = useState('');
-  const [grade, setGrade] = useState('');
+  const [genders, setGenders] = useState<string[]>([]);
+  const [grades, setGrades] = useState<string[]>([]);
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
   const [isCreateMode, setIsCreateMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -33,33 +31,29 @@ export default function DevelopersPage() {
 
   const handleSearch = (filters: SearchFilters) => {
     setName(filters.name || '');
-    setEmail(filters.email || '');
     setPhone(filters.phone || '');
     setSkills(filters.skills || '');
     setExcludeSkills(filters.excludeSkills || '');
     setSkillsCondition(filters.skillsCondition || 'OR');
     setExcludeSkillsCondition(filters.excludeSkillsCondition || 'OR');
-    setGender(filters.gender || '');
-    setPosition(filters.position || '');
-    setGrade(filters.grade || '');
+    setGenders(filters.genders || []);
+    setGrades(filters.grades || []);
     setPage(1); // Reset to first page on new search
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['developers', page, pageSize, name, email, phone, skills, excludeSkills, skillsCondition, excludeSkillsCondition, gender, position, grade],
+    queryKey: ['developers', page, pageSize, name, phone, skills, excludeSkills, skillsCondition, excludeSkillsCondition, genders, grades],
     queryFn: () => developerService.getDevelopers({ 
       page, 
       pageSize, 
       name,
-      email,
       phone,
       skills,
       excludeSkills,
       skillsCondition,
       excludeSkillsCondition,
-      gender, 
-      position, 
-      grade 
+      genders, 
+      grades 
     }),
   });
 

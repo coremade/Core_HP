@@ -7,47 +7,107 @@ exports.getAllDevelopers = async (req, res, next) => {
     console.log('요청 파라미터:', {
       page: req.query.page,
       pageSize: req.query.pageSize,
-      searchKeyword: req.query.searchKeyword,
-      gender: req.query.gender,
-      position: req.query.position,
-      grade: req.query.grade
+      name: req.query.name,
+      email: req.query.email,
+      phone: req.query.phone,
+      skills: req.query.skills,
+      excludeSkills: req.query.excludeSkills,
+      skillsCondition: req.query.skillsCondition,
+      excludeSkillsCondition: req.query.excludeSkillsCondition,
+      genders: req.query.genders,
+      positions: req.query.positions,
+      grades: req.query.grades
     });
 
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
-    const searchKeyword = req.query.searchKeyword || '';
-    const gender = req.query.gender || '';
-    const position = req.query.position || '';
-    const grade = req.query.grade || '';
+    const name = req.query.name || '';
+    const email = req.query.email || '';
+    const phone = req.query.phone || '';
+    const skills = req.query.skills || '';
+    const excludeSkills = req.query.excludeSkills || '';
+    const skillsCondition = req.query.skillsCondition || 'OR';
+    const excludeSkillsCondition = req.query.excludeSkillsCondition || 'OR';
+    const genders = req.query.genders ? req.query.genders.split(',') : [];
+    const positions = req.query.positions ? req.query.positions.split(',') : [];
+    const grades = req.query.grades ? req.query.grades.split(',') : [];
     const offset = (page - 1) * pageSize;
 
     const where = {};
-    if (searchKeyword) {
-      where[Op.or] = [
-        { developer_name: { [Op.like]: `%${searchKeyword}%` } },
-        { developer_email: { [Op.like]: `%${searchKeyword}%` } },
-        { developer_phone: { [Op.like]: `%${searchKeyword}%` } }
-      ];
-      console.log('검색 조건:', where);
+
+    // 개별 검색 조건들
+    if (name) {
+      where.developer_name = { [Op.like]: `%${name}%` };
+      console.log('이름 검색 조건:', name);
     }
 
-    // 성별 검색 조건 추가
-    if (gender) {
-      where.developer_sex = gender;
-      console.log('성별 검색 조건:', gender);
+    if (email) {
+      where.developer_email = { [Op.like]: `%${email}%` };
+      console.log('이메일 검색 조건:', email);
     }
 
-    // 직급 검색 조건 추가
-    if (position) {
-      where.developer_current_position = position;
-      console.log('직급 검색 조건:', position);
+    if (phone) {
+      where.developer_phone = { [Op.like]: `%${phone}%` };
+      console.log('전화번호 검색 조건:', phone);
     }
 
-    // 등급 검색 조건 추가
-    if (grade) {
-      where.developer_grade = grade;
-      console.log('등급 검색 조건:', grade);
+    // 기술 검색 로직 (기존 코드 유지)
+    if (skills) {
+      const skillList = skills.split(',').map(skill => skill.trim());
+      if (skillsCondition === 'AND') {
+        // AND 조건: 모든 기술을 포함해야 함
+        where[Op.and] = skillList.map(skill => ({
+          developer_skills: { [Op.like]: `%${skill}%` }
+        }));
+      } else {
+        // OR 조건: 하나 이상의 기술을 포함하면 됨
+        where[Op.or] = skillList.map(skill => ({
+          developer_skills: { [Op.like]: `%${skill}%` }
+        }));
+      }
+      console.log(`기술 검색 조건 (${skillsCondition}):`, skillList);
     }
+
+    // 제외 기술 검색 로직
+    if (excludeSkills) {
+      const excludeSkillList = excludeSkills.split(',').map(skill => skill.trim());
+      if (excludeSkillsCondition === 'AND') {
+        // AND 조건: 모든 제외 기술을 포함하지 않아야 함
+        where[Op.and] = where[Op.and] || [];
+        where[Op.and].push(...excludeSkillList.map(skill => ({
+          developer_skills: { [Op.notLike]: `%${skill}%` }
+        })));
+      } else {
+        // OR 조건: 하나라도 포함하지 않으면 됨
+        where[Op.and] = where[Op.and] || [];
+        where[Op.and].push({
+          [Op.or]: excludeSkillList.map(skill => ({
+            developer_skills: { [Op.notLike]: `%${skill}%` }
+          }))
+        });
+      }
+      console.log(`제외 기술 검색 조건 (${excludeSkillsCondition}):`, excludeSkillList);
+    }
+
+    // 성별 검색 조건 추가 (OR 조건)
+    if (genders.length > 0) {
+      where.developer_sex = { [Op.in]: genders };
+      console.log('성별 검색 조건 (OR):', genders);
+    }
+
+    // 직급 검색 조건 추가 (OR 조건)
+    if (positions.length > 0) {
+      where.developer_current_position = { [Op.in]: positions };
+      console.log('직급 검색 조건 (OR):', positions);
+    }
+
+    // 등급 검색 조건 추가 (OR 조건)
+    if (grades.length > 0) {
+      where.developer_grade = { [Op.in]: grades };
+      console.log('등급 검색 조건 (OR):', grades);
+    }
+
+    console.log('최종 WHERE 조건:', JSON.stringify(where, null, 2));
 
     const { count, rows: developers } = await Developer.findAndCountAll({
       where,
