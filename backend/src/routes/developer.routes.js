@@ -50,7 +50,7 @@ router.get("/", async (req, res) => {
       const offset = (page - 1) * limit;
       
       // 검색 조건
-      const { name, email, phone, gender, position, grade, skills, excludeSkills } = req.query;
+      const { name, email, phone, gender, position, grade, skills, excludeSkills, skillsCondition, excludeSkillsCondition } = req.query;
       
       // 기본 검색 조건
       const whereCondition = {};
@@ -67,7 +67,7 @@ router.get("/", async (req, res) => {
         whereCondition.developer_sex = gender;
       }
       if (position) {
-        whereCondition.developer_position = position;
+        whereCondition.developer_current_position = position;
       }
       if (grade) {
         whereCondition.developer_grade = grade;
@@ -97,9 +97,12 @@ router.get("/", async (req, res) => {
             ]
           }));
 
+          // excludeSkillsCondition에 따라 AND/OR 결정 (기본값: OR)
+          const excludeSearchCondition = excludeSkillsCondition === 'AND' ? Op.and : Op.or;
+          
           const excludeSkillDeveloperIds = await DeveloperSkillInfo.findAll({
             where: {
-              [Op.and]: excludeSkillConditions // OR로 수정: 어떤 제외 기술이라도 가진 개발자
+              [excludeSearchCondition]: excludeSkillConditions
             },
             attributes: ['developer_id'],
             raw: true
@@ -137,10 +140,13 @@ router.get("/", async (req, res) => {
             ]
           }));
 
+          // skillsCondition에 따라 AND/OR 결정 (기본값: OR)
+          const searchCondition = skillsCondition === 'AND' ? Op.and : Op.or;
+          
           includeConditions.push({
             model: DeveloperSkillInfo,
             where: {
-              [Op.and]: skillConditions // OR로 수정: 어떤 기술이라도 가진 개발자
+              [searchCondition]: skillConditions
             },
             required: true // INNER JOIN
           });

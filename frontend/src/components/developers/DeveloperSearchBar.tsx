@@ -11,6 +11,8 @@ export interface SearchFilters {
   email?: string;
   skills?: string;
   excludeSkills?: string;
+  skillsCondition?: string;
+  excludeSkillsCondition?: string;
   position?: string;
   grade?: string;
   gender?: string;
@@ -22,6 +24,10 @@ const genders = [
   { value: 'M', label: '남성' },
   { value: 'F', label: '여성' }
 ];
+const skillsConditions = [
+  { value: 'AND', label: 'AND (모든 기술 포함)' },
+  { value: 'OR', label: 'OR (하나 이상 포함)' }
+];
 
 export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps) {
   const [filters, setFilters] = useState<SearchFilters>({
@@ -30,6 +36,8 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
     email: '',
     skills: '',
     excludeSkills: '',
+    skillsCondition: 'OR',
+    excludeSkillsCondition: 'OR',
     position: '',
     grade: '',
     gender: '',
@@ -68,23 +76,29 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
         <Box sx={{ flex: '0 0 50%', display: 'flex', gap: 3 }}>
           <TextField
             size="small"
-            label="이메일"
-            InputLabelProps={{ shrink: true }}
-            placeholder="이메일로 검색"
-            value={filters.email || ''}
-            onChange={(e) => handleChange('email', e.target.value)}
-            sx={{ flex: 1 }}
-          />
-
-          <TextField
-            size="small"
             label="기술"
             InputLabelProps={{ shrink: true }}
-            placeholder="기술로 검색 (콤마로 구분)"
+            placeholder="기술로 검색 (콤마`,`로 구분)"
             value={filters.skills || ''}
             onChange={(e) => handleChange('skills', e.target.value)}
-            sx={{ flex: 1 }}
+            sx={{ flex: 2.5 }}
           />
+
+          <FormControl size="small" sx={{ flex: 1 }}>
+            <InputLabel shrink>기술 검색 조건</InputLabel>
+            <Select
+              value={filters.skillsCondition || 'OR'}
+              label="기술 검색 조건"
+              onChange={(e) => handleChange('skillsCondition', e.target.value)}
+              displayEmpty
+            >
+              {skillsConditions.map((condition) => (
+                <MenuItem key={condition.value} value={condition.value}>
+                  {condition.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
       </Box>
 
@@ -94,13 +108,30 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
             size="small"
             label="제외 기술"
             InputLabelProps={{ shrink: true }}
-            placeholder="제외할 기술로 검색 (콤마로 구분)"
+            placeholder="제외할 기술로 검색 (콤마`,`로 구분)"
             value={filters.excludeSkills || ''}
             onChange={(e) => handleChange('excludeSkills', e.target.value)}
-            sx={{ flex: 1 }}
+            sx={{ flex: 2.5 }}
           />
 
           <FormControl size="small" sx={{ flex: 1 }}>
+            <InputLabel shrink>제외 기술 검색 조건</InputLabel>
+            <Select
+              value={filters.excludeSkillsCondition || 'OR'}
+              label="제외 기술 검색 조건"
+              onChange={(e) => handleChange('excludeSkillsCondition', e.target.value)}
+              displayEmpty
+            >
+              {skillsConditions.map((condition) => (
+                <MenuItem key={condition.value} value={condition.value}>
+                  {condition.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ flex: '0 0 50%', display: 'flex', gap: 3 }}>
+        <FormControl size="small" sx={{ flex: 1 }}>
             <InputLabel shrink>성별</InputLabel>
             <Select
               value={filters.gender || ''}
@@ -116,8 +147,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
               ))}
             </Select>
           </FormControl>
-        </Box>
-        <Box sx={{ flex: '0 0 50%', display: 'flex', gap: 3 }}>
+          
           <FormControl size="small" sx={{ flex: 1 }}>
             <InputLabel shrink>직급</InputLabel>
             <Select

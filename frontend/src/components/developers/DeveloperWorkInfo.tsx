@@ -59,6 +59,11 @@ const formatYearMonth = (ym: string) => {
   return `${ym.slice(0, 4)}-${ym.slice(4)}`;
 };
 
+const truncateText = (text: string | null | undefined, maxLength: number = 10) => {
+  if (!text) return '-';
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
 export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProps) {
   const [works, setWorks] = useState<WorkInfo[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -197,7 +202,7 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
         work_end_ym: formData.work_end_ym || null,
         work_name: formData.work_name,
         work_position: formData.work_position,
-        work_description: formData.work_task || null
+        work_task: formData.work_task || null
       };
 
       if (editingItem) {
@@ -296,7 +301,7 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
                 <TableCell>{work.work_end_ym ? formatYearMonth(work.work_end_ym) : '재직중'}</TableCell>
                 <TableCell>{work.work_name}</TableCell>
                 <TableCell>{work.work_position || '-'}</TableCell>
-                <TableCell>{work.work_task || '-'}</TableCell>
+                <TableCell title={work.work_task || ''}>{truncateText(work.work_task)}</TableCell>
                 <TableCell>
                   <Button
                     onClick={() => handleEdit(work)}
