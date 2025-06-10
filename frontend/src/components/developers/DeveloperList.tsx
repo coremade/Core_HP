@@ -92,7 +92,7 @@ export default function DeveloperList({
   const handleDelete = () => {
     if (selectedDevelopers.length === 0) return;
 
-    if (window.confirm(`선택한 ${selectedDevelopers.length}명의 개발자를 삭제하시겠습니까?`)) {
+    if (window.confirm(`선택한 ${selectedDevelopers.length}명의 개발자를 삭제하시겠습니까?\n관련된 정보가 모두 삭제되며, 삭제된 개발자는 복구할 수 없습니다.`)) {
       onDeleteDevelopers(selectedDevelopers);
       setSelectedDevelopers([]);
     }

@@ -264,7 +264,7 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
         <TableCell>작업</TableCell>
       </TableRow>
     </TableHead>
-  ), [skills.length, selectedItems.length, handleSelectAll]);
+  ), [selectedItems.length, skills.length, handleSelectAll]);
 
   const TableContent = useMemo(() => (
     <TableBody>
@@ -277,17 +277,14 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
             />
           </TableCell>
           <TableCell>{formatYearMonth(skill.project_start_ym)}</TableCell>
-          <TableCell>
-            {skill.project_end_ym ? formatYearMonth(skill.project_end_ym) : '진행중'}
-          </TableCell>
+          <TableCell>{skill.project_end_ym ? formatYearMonth(skill.project_end_ym) : '진행중'}</TableCell>
           <TableCell>{skill.project_name}</TableCell>
           <TableCell>{skill.task || '-'}</TableCell>
           <TableCell>
             <Box>
               <Button
-                size="small"
+                
                 onClick={() => handleEdit(skill)}
-                sx={{ mr: 1 }}
               >
                 수정
               </Button>
@@ -301,7 +298,7 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
   const EditDialog = useMemo(() => (
     <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="md" fullWidth>
       <DialogTitle>{editingItem ? '기술 이력 수정' : '기술 이력 추가'}</DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ px: 2 }}>
         <Box sx={{ display: 'grid', gap: 2, pt: 2 }}>
           <TextField
             label="시작년월 (YYYY-MM)"
@@ -386,7 +383,11 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
           />
         </Box>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ 
+        px: 2, 
+        justifyContent: 'flex-end',
+        paddingRight: '32px'
+      }}>
         <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
         <Button onClick={handleSubmit} variant="contained" color="primary">
           저장
@@ -445,7 +446,7 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
     }
   };
 
-  return (
+  const SkillInfoContent = (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
         <Button
@@ -484,5 +485,147 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
 
       {EditDialog}
     </Box>
+  );
+
+  return SkillInfoContent;
+}
+
+// 기술 이력 상세 정보 팝업 컴포넌트
+interface DeveloperSkillDetailDialogProps {
+  open: boolean;
+  onClose: () => void;
+  developerId: string;
+  projectStartYm: string;
+  title?: string;
+  readonly?: boolean;
+}
+
+export function DeveloperSkillDetailDialog({ 
+  open, 
+  onClose, 
+  developerId, 
+  projectStartYm, 
+  title = "기술 이력", 
+  readonly = true 
+}: DeveloperSkillDetailDialogProps) {
+  const [skillDetail, setSkillDetail] = useState<ApiSkillInfo | null>(null);
+
+  const loadSkillDetail = useCallback(async () => {
+    if (!developerId || !projectStartYm) return;
+
+    try {
+      const response = await axios.get<ApiResponse>(`${API_BASE_URL}/developers/${developerId}/skills`);
+      const skill = response.data.skills?.find(s => s.project_start_ym.replace(/(\d{4})(\d{2})/, '$1-$2') === projectStartYm);
+      if (skill) {
+        setSkillDetail({
+          ...skill,
+          project_start_ym: skill.project_start_ym.replace(/(\d{4})(\d{2})/, '$1-$2'),
+          project_end_ym: skill.project_end_ym ? skill.project_end_ym.replace(/(\d{4})(\d{2})/, '$1-$2') : null
+        });
+      }
+    } catch (error) {
+      console.error('기술 이력 상세 조회 중 오류:', error);
+    }
+  }, [developerId, projectStartYm]);
+
+  useEffect(() => {
+    if (open) {
+      loadSkillDetail();
+    }
+  }, [open, loadSkillDetail]);
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent sx={{ px: 2 }}>
+        <Box sx={{ display: 'grid', gap: 2, pt: 2 }}>
+          <TextField
+            label="시작년월"
+            value={skillDetail?.project_start_ym || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="종료년월"
+            value={skillDetail?.project_end_ym || '진행중'}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="프로젝트명"
+            value={skillDetail?.project_name || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="업무"
+            value={skillDetail?.task || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+            multiline
+            rows={3}
+          />
+          <TextField
+            label="발주처"
+            value={skillDetail?.project_client_id || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="수행사"
+            value={skillDetail?.project_practitioner_id || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="개발 모델"
+            value={skillDetail?.project_skill_model || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="운영체제"
+            value={skillDetail?.project_skill_os || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="개발 언어"
+            value={skillDetail?.project_skill_language || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="DBMS"
+            value={skillDetail?.project_skill_dbms || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="개발 도구"
+            value={skillDetail?.project_skill_tool || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="프로토콜"
+            value={skillDetail?.project_skill_protocol || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+          />
+          <TextField
+            label="기타"
+            value={skillDetail?.project_skill_etc || ''}
+            InputProps={{ readOnly: readonly }}
+            variant={readonly ? "standard" : "outlined"}
+            multiline
+            rows={3}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
+        <Button onClick={onClose}>닫기</Button>
+      </DialogActions>
+    </Dialog>
   );
 } 

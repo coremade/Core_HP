@@ -332,7 +332,6 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
                 <TableCell>{cert.certification_agency || '-'}</TableCell>
                 <TableCell>
                   <Button
-                    size="small"
                     onClick={() => handleEdit(cert)}
                   >
                     수정
@@ -369,7 +368,7 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editingItem ? '자격증 정보 수정' : '자격증 정보 추가'}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ px: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
               <DatePicker
@@ -424,7 +423,7 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
             />
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
           <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
           <Button onClick={handleSubmit} variant="contained">저장</Button>
         </DialogActions>

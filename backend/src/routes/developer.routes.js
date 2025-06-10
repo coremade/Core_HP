@@ -8,6 +8,7 @@ const fs = require("fs");
 const { Op } = require("sequelize");
 const { Developer } = require("../models");
 const { SchoolInfo, CertificationInfo, WorkInfo, SkillInfo, DeveloperSkillInfo } = require("../models");
+const { sequelize } = require("../models");
 
 // 프로필 이미지 저장을 위한 multer 설정
 const storage = multer.diskStorage({
@@ -216,8 +217,17 @@ router.post("/", async (req, res) => {
     }
     const formattedPhone = `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 7)}-${phoneNumber.slice(7)}`;
 
+    // 다음 개발자 ID 계산 (최대값 + 1)
+    const maxIdResult = await Developer.findOne({
+      attributes: [[sequelize.fn('MAX', sequelize.cast(sequelize.col('developer_id'), 'UNSIGNED')), 'maxId']],
+      raw: true
+    });
+    const nextId = parseInt(maxIdResult.maxId || 0) + 1;
+    console.log('현재 최대 ID:', maxIdResult.maxId, '다음 개발자 ID:', nextId);
+
     // 새 개발자 생성
     const developer = await Developer.create({
+      developer_id: nextId,
       developer_name: req.body.developer_name,
       developer_birth: req.body.developer_birth || null,
       developer_sex: req.body.developer_sex || null,

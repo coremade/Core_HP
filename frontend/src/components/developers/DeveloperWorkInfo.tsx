@@ -299,7 +299,6 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
                 <TableCell>{work.work_task || '-'}</TableCell>
                 <TableCell>
                   <Button
-                    size="small"
                     onClick={() => handleEdit(work)}
                   >
                     수정
@@ -336,7 +335,7 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editingItem ? '근무 이력 수정' : '근무 이력 추가'}</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ px: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
               <DatePicker
@@ -423,7 +422,7 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
             />
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
           <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
           <Button onClick={handleSubmit} variant="contained">저장</Button>
         </DialogActions>
