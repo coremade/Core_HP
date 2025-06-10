@@ -5,6 +5,7 @@ import { Container, Box, Typography, Snackbar, Alert } from '@mui/material';
 import DeveloperList from '../../components/developers/DeveloperList';
 import DeveloperDetailForm from '../../components/developers/DeveloperDetailForm';
 import DeveloperSearchBar from '../../components/developers/DeveloperSearchBar';
+import SidebarMenu from '../../components/common/SidebarMenu';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { developerService } from '../../services/developerService';
 import type { Developer, CreateDeveloperDto } from '../../services/developerService';
@@ -163,47 +164,50 @@ export default function DevelopersPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={6000}
-        onClose={() => setSuccessMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSuccessMessage('')}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setErrorMessage('')}
-          severity="error"
-          sx={{ width: '100%' }}
-        >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-
-      <Typography variant="h4" component="h1" gutterBottom>
-        개발자 관리
-      </Typography>
-
-      <Box sx={{ mb: 3 }}>
-        <DeveloperSearchBar onSearch={handleSearch} />
-      </Box>
+    <>
+      <SidebarMenu/>
       
-      <Box sx={{ display: 'flex', gap: 3 }}>
-        <Box sx={{ flex: '0 0 50%' }}>
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Snackbar
+          open={!!successMessage}
+          autoHideDuration={6000}
+          onClose={() => setSuccessMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={() => setSuccessMessage('')}
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={!!errorMessage}
+          autoHideDuration={6000}
+          onClose={() => setErrorMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={() => setErrorMessage('')}
+            severity="error"
+            sx={{ width: '100%' }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+
+        <Typography variant="h4" component="h1" gutterBottom>
+          개발자 관리
+        </Typography>
+
+        <Box sx={{ mb: 3 }}>
+          <DeveloperSearchBar onSearch={handleSearch} />
+        </Box>
+        
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <Box sx={{ flex: '0 0 50%' }}>
           <DeveloperList
             developers={data?.developers || []}
             selectedDeveloperId={selectedDeveloper?.developer_id || null}
@@ -226,7 +230,8 @@ export default function DevelopersPage() {
             onCancel={handleCancel}
           />
         </Box>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </>
   );
 }
