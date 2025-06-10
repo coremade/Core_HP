@@ -59,13 +59,13 @@ interface ValidationErrors {
   developer_grade?: string;
 }
 
-interface DeveloperSkill {
+interface DeveloperSkillInfo {
   developer_id: string;
   project_start_ym: string;
   project_name?: string;
   project_practitioner_id?: string;
   project_client_id?: string;
-  role?: string;
+  task?: string;
   project_end_ym?: string;
   project_skill_model?: string;
   project_skill_os?: string;
@@ -163,7 +163,7 @@ export default function DeveloperDetailForm({
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
   const [currentTab, setCurrentTab] = useState(TabType.BASIC_INFO);
-  const [skills, setSkills] = useState<DeveloperSkill[]>([]);
+  const [skills, setSkills] = useState<DeveloperSkillInfo[]>([]);
   const [schools, setSchools] = useState<SchoolInfo[]>([]);
   const [works, setWorks] = useState<WorkInfo[]>([]);
   const [certifications, setCertifications] = useState<CertificationInfo[]>([]);

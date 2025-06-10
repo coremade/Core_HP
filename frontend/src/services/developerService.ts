@@ -10,6 +10,8 @@ interface DeveloperQueryParams {
   phone?: string;
   skills?: string;
   excludeSkills?: string;
+  skillsCondition?: string;
+  excludeSkillsCondition?: string;
   gender?: string;
   position?: string;
   grade?: string;
@@ -28,11 +30,13 @@ export interface Developer {
   developer_career_start_date?: string;
   developer_current_position: string;
   developer_grade: string;
-  developer_married?: boolean;
+  developer_married?: string;
   developer_military_start_date?: string;
   developer_military_end_date?: string;
   developer_military_desc?: string;
   developer_skills?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CreateDeveloperDto {
@@ -47,7 +51,7 @@ export interface CreateDeveloperDto {
   developer_career_start_date?: string;
   developer_current_position: string;
   developer_grade: string;
-  developer_married?: boolean;
+  developer_married?: string;
   developer_military_start_date?: string;
   developer_military_end_date?: string;
   developer_military_desc?: string;
@@ -74,6 +78,8 @@ export const developerService = {
     if (params.phone) queryParams.append('phone', params.phone);
     if (params.skills) queryParams.append('skills', params.skills);
     if (params.excludeSkills) queryParams.append('excludeSkills', params.excludeSkills);
+    if (params.skillsCondition) queryParams.append('skillsCondition', params.skillsCondition);
+    if (params.excludeSkillsCondition) queryParams.append('excludeSkillsCondition', params.excludeSkillsCondition);
     if (params.gender) queryParams.append('gender', params.gender);
     if (params.position) queryParams.append('position', params.position);
     if (params.grade) queryParams.append('grade', params.grade);

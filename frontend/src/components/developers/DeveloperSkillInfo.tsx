@@ -81,6 +81,11 @@ const formatYearMonth = (ym: string) => {
   return `${ym.slice(0, 4)}-${ym.slice(4)}`;
 };
 
+const truncateText = (text: string | null | undefined, maxLength: number = 10) => {
+  if (!text) return '-';
+  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+};
+
 const pageSizeOptions = [10, 25, 50, 100];
 
 export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoProps) {
@@ -279,7 +284,7 @@ export default function DeveloperSkillInfo({ developerId }: DeveloperSkillInfoPr
           <TableCell>{formatYearMonth(skill.project_start_ym)}</TableCell>
           <TableCell>{skill.project_end_ym ? formatYearMonth(skill.project_end_ym) : '진행중'}</TableCell>
           <TableCell>{skill.project_name}</TableCell>
-          <TableCell>{skill.task || '-'}</TableCell>
+          <TableCell title={skill.task || ''}>{truncateText(skill.task)}</TableCell>
           <TableCell>
             <Box>
               <Button

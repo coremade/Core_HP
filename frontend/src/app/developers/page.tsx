@@ -18,6 +18,8 @@ export default function DevelopersPage() {
   const [phone, setPhone] = useState('');
   const [skills, setSkills] = useState('');
   const [excludeSkills, setExcludeSkills] = useState('');
+  const [skillsCondition, setSkillsCondition] = useState('OR');
+  const [excludeSkillsCondition, setExcludeSkillsCondition] = useState('OR');
   const [gender, setGender] = useState('');
   const [position, setPosition] = useState('');
   const [grade, setGrade] = useState('');
@@ -34,6 +36,8 @@ export default function DevelopersPage() {
     setPhone(filters.phone || '');
     setSkills(filters.skills || '');
     setExcludeSkills(filters.excludeSkills || '');
+    setSkillsCondition(filters.skillsCondition || 'OR');
+    setExcludeSkillsCondition(filters.excludeSkillsCondition || 'OR');
     setGender(filters.gender || '');
     setPosition(filters.position || '');
     setGrade(filters.grade || '');
@@ -41,7 +45,7 @@ export default function DevelopersPage() {
   };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['developers', page, pageSize, name, email, phone, skills, excludeSkills, gender, position, grade],
+    queryKey: ['developers', page, pageSize, name, email, phone, skills, excludeSkills, skillsCondition, excludeSkillsCondition, gender, position, grade],
     queryFn: () => developerService.getDevelopers({ 
       page, 
       pageSize, 
@@ -50,6 +54,8 @@ export default function DevelopersPage() {
       phone,
       skills,
       excludeSkills,
+      skillsCondition,
+      excludeSkillsCondition,
       gender, 
       position, 
       grade 
