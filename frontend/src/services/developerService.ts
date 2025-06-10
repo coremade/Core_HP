@@ -109,7 +109,9 @@ export const developerService = {
   // 개발자 삭제 (단일 또는 여러명)
   async deleteDevelopers(ids: string[]): Promise<void> {
     console.log('Deleting developers:', ids);
-    const response = await axios.delete(`${API_BASE_URL}/${ids.join(',')}`);
+    const response = await axios.delete(API_BASE_URL, {
+      data: { ids }
+    });
     return response.data;
   },
 }; 
