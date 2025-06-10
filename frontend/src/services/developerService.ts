@@ -12,9 +12,9 @@ interface DeveloperQueryParams {
   excludeSkills?: string;
   skillsCondition?: string;
   excludeSkillsCondition?: string;
-  gender?: string;
-  position?: string;
-  grade?: string;
+  genders?: string[];
+  positions?: string[];
+  grades?: string[];
 }
 
 export interface Developer {
@@ -80,9 +80,9 @@ export const developerService = {
     if (params.excludeSkills) queryParams.append('excludeSkills', params.excludeSkills);
     if (params.skillsCondition) queryParams.append('skillsCondition', params.skillsCondition);
     if (params.excludeSkillsCondition) queryParams.append('excludeSkillsCondition', params.excludeSkillsCondition);
-    if (params.gender) queryParams.append('gender', params.gender);
-    if (params.position) queryParams.append('position', params.position);
-    if (params.grade) queryParams.append('grade', params.grade);
+    if (params.genders && params.genders.length > 0) queryParams.append('genders', params.genders.join(','));
+    if (params.positions && params.positions.length > 0) queryParams.append('positions', params.positions.join(','));
+    if (params.grades && params.grades.length > 0) queryParams.append('grades', params.grades.join(','));
 
     const response = await axios.get(`${API_BASE_URL}?${queryParams}`);
     return response.data;

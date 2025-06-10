@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, TextField } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, MenuItem, TextField, FormGroup, FormControlLabel, Checkbox, Typography } from '@mui/material';
 
 interface DeveloperSearchBarProps {
   onSearch: (filters: SearchFilters) => void;
@@ -8,17 +8,14 @@ interface DeveloperSearchBarProps {
 export interface SearchFilters {
   name?: string;
   phone?: string;
-  email?: string;
   skills?: string;
   excludeSkills?: string;
   skillsCondition?: string;
   excludeSkillsCondition?: string;
-  position?: string;
-  grade?: string;
-  gender?: string;
+  grades?: string[];
+  genders?: string[];
 }
 
-const positions = ['사원', '대리', '과장', '차장', '부장'];
 const grades = ['초급', '중급', '고급', '특급'];
 const genders = [
   { value: 'M', label: '남성' },
@@ -33,18 +30,38 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
   const [filters, setFilters] = useState<SearchFilters>({
     name: '',
     phone: '',
-    email: '',
     skills: '',
     excludeSkills: '',
     skillsCondition: 'OR',
     excludeSkillsCondition: 'OR',
-    position: '',
-    grade: '',
-    gender: '',
+    grades: [...grades], // 모든 등급 선택
+    genders: genders.map(g => g.value), // 모든 성별 선택
   });
 
   const handleChange = (field: keyof SearchFilters, value: string) => {
     const newFilters = { ...filters, [field]: value };
+    setFilters(newFilters);
+    onSearch(newFilters);
+  };
+
+  const handleCheckboxChange = (category: 'grades' | 'genders', value: string, checked: boolean) => {
+    const currentValues = filters[category] || [];
+    let newValues: string[];
+    
+    if (checked) {
+      newValues = [...currentValues, value];
+    } else {
+      newValues = currentValues.filter((v: string) => v !== value);
+    }
+    
+    const newFilters = { ...filters, [category]: newValues };
+    setFilters(newFilters);
+    onSearch(newFilters);
+  };
+
+  const handleSelectAll = (category: 'grades' | 'genders', allValues: string[], checked: boolean) => {
+    const newValues = checked ? [...allValues] : [];
+    const newFilters = { ...filters, [category]: newValues };
     setFilters(newFilters);
     onSearch(newFilters);
   };
@@ -130,57 +147,105 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
             </Select>
           </FormControl>
         </Box>
-        <Box sx={{ flex: '0 0 50%', display: 'flex', gap: 3 }}>
-        <FormControl size="small" sx={{ flex: 1 }}>
-            <InputLabel shrink>성별</InputLabel>
-            <Select
-              value={filters.gender || ''}
-              label="성별"
-              onChange={(e) => handleChange('gender', e.target.value)}
-              displayEmpty
-            >
-              <MenuItem value="">전체</MenuItem>
-              {genders.map((gender) => (
-                <MenuItem key={gender.value} value={gender.value}>
-                  {gender.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
-          <FormControl size="small" sx={{ flex: 1 }}>
-            <InputLabel shrink>직급</InputLabel>
-            <Select
-              value={filters.position || ''}
-              label="직급"
-              onChange={(e) => handleChange('position', e.target.value)}
-              displayEmpty
-            >
-              <MenuItem value="">전체</MenuItem>
-              {positions.map((position) => (
-                <MenuItem key={position} value={position}>
-                  {position}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        <Box sx={{ flex: '0 0 50%' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1.5, 
+            alignItems: 'center',
+            border: '1px solid #e0e0e0',
+            borderRadius: 1,
+            flexWrap: 'wrap',
+            minHeight: '56px'
+          }}>
+            {/* 성별 체크박스 */}
+            <Box sx={{ minWidth: 'fit-content' }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.2, fontWeight: 600, fontSize: '0.8rem' }}>성별</Typography>
+              <FormGroup row sx={{ gap: 0.3 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={filters.genders?.length === genders.length}
+                      onChange={(e) => handleSelectAll('genders', genders.map(g => g.value), e.target.checked)}
+                    />
+                  }
+                  label="전체"
+                  sx={{ 
+                    mr: 0.3, 
+                    '& .MuiFormControlLabel-label': { fontSize: '0.75rem' },
+                    '& .MuiFormControlLabel-root': { margin: 0 },
+                  }}
+                />
+                {genders.map((gender) => (
+                  <FormControlLabel
+                    key={gender.value}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={filters.genders?.includes(gender.value) || false}
+                        onChange={(e) => handleCheckboxChange('genders', gender.value, e.target.checked)}
+                      />
+                    }
+                    label={gender.label}
+                    sx={{ 
+                      mr: 0.3, 
+                      '& .MuiFormControlLabel-label': { fontSize: '0.75rem' },
+                      '& .MuiFormControlLabel-root': { margin: 0 },
+                      margin: 0
+                    }}
+                  />
+                ))}
+              </FormGroup>
+            </Box>
 
-          <FormControl size="small" sx={{ flex: 1 }}>
-            <InputLabel shrink>등급</InputLabel>
-            <Select
-              value={filters.grade || ''}
-              label="등급"
-              onChange={(e) => handleChange('grade', e.target.value)}
-              displayEmpty
-            >
-              <MenuItem value="">전체</MenuItem>
-              {grades.map((grade) => (
-                <MenuItem key={grade} value={grade}>
-                  {grade}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+            {/* 구분선 */}
+            <Box sx={{ 
+              borderLeft: '1px dashed #ccc', 
+              height: '40px', 
+              alignSelf: 'center' 
+            }} />
+
+            {/* 등급 체크박스 */}
+            <Box sx={{ minWidth: 'fit-content' }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.2, fontWeight: 600, fontSize: '0.8rem' }}>등급</Typography>
+              <FormGroup row sx={{ gap: 0.3 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={filters.grades?.length === grades.length}
+                      onChange={(e) => handleSelectAll('grades', grades, e.target.checked)}
+                    />
+                  }
+                  label="전체"
+                  sx={{ 
+                    mr: 0.3, 
+                    '& .MuiFormControlLabel-label': { fontSize: '0.75rem' },
+                    '& .MuiFormControlLabel-root': { margin: 0 },
+                  }}
+                />
+                {grades.map((grade) => (
+                  <FormControlLabel
+                    key={grade}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={filters.grades?.includes(grade) || false}
+                        onChange={(e) => handleCheckboxChange('grades', grade, e.target.checked)}
+                      />
+                    }
+                    label={grade}
+                    sx={{ 
+                      mr: 0.3, 
+                      '& .MuiFormControlLabel-label': { fontSize: '0.75rem' },
+                      '& .MuiFormControlLabel-root': { margin: 0 },
+                      margin: 0
+                    }}
+                  />
+                ))}
+              </FormGroup>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

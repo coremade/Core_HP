@@ -50,27 +50,47 @@ router.get("/", async (req, res) => {
       const offset = (page - 1) * limit;
       
       // 검색 조건
-      const { name, email, phone, gender, position, grade, skills, excludeSkills, skillsCondition, excludeSkillsCondition } = req.query;
+      const { name, phone, genders, grades, skills, excludeSkills, skillsCondition, excludeSkillsCondition } = req.query;
+      
+      console.log('라우터에서 받은 검색 조건:', { name, phone, genders, grades, skills, excludeSkills, skillsCondition, excludeSkillsCondition });
       
       // 기본 검색 조건
       const whereCondition = {};
       if (name) {
         whereCondition.developer_name = { [Op.like]: `%${name}%` };
       }
-      if (email) {
-        whereCondition.developer_email = { [Op.like]: `%${email}%` };
-      }
       if (phone) {
         whereCondition.developer_phone = { [Op.like]: `%${phone}%` };
       }
-      if (gender) {
-        whereCondition.developer_sex = gender;
+      
+      // 성별 검색 조건 (배열 형태, OR 조건)
+      if (genders) {
+        const genderArray = genders.split(',').filter(g => g.trim());
+        if (genderArray.length > 0) {
+          // 전체 성별 배열 정의
+          const allGenders = ['M', 'F'];
+          // 선택된 성별이 전체가 아닐 때만 조건 적용
+          if (genderArray.length < allGenders.length) {
+            whereCondition.developer_sex = { [Op.in]: genderArray };
+            console.log('성별 검색 조건:', genderArray);
+          }
+        }
       }
-      if (position) {
-        whereCondition.developer_current_position = position;
-      }
-      if (grade) {
-        whereCondition.developer_grade = grade;
+      
+
+      
+      // 등급 검색 조건 (배열 형태, OR 조건)
+      if (grades) {
+        const gradeArray = grades.split(',').filter(g => g.trim());
+        if (gradeArray.length > 0) {
+          // 전체 등급 배열 정의
+          const allGrades = ['초급', '중급', '고급', '특급'];
+          // 선택된 등급이 전체가 아닐 때만 조건 적용
+          if (gradeArray.length < allGrades.length) {
+            whereCondition.developer_grade = { [Op.in]: gradeArray };
+            console.log('등급 검색 조건:', gradeArray);
+          }
+        }
       }
 
       // 제외 기술 검색 조건 - 해당 기술을 가지지 않은 개발자 찾기
@@ -164,6 +184,9 @@ router.get("/", async (req, res) => {
       if (includeConditions.length > 0) {
         queryOptions.include = includeConditions;
       }
+
+      console.log('최종 WHERE 조건:', JSON.stringify(whereCondition, null, 2));
+      console.log('쿼리 옵션:', JSON.stringify(queryOptions, null, 2));
 
       const { count, rows: developers } = await Developer.findAndCountAll(queryOptions);
 

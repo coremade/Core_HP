@@ -35,7 +35,19 @@ export default function SidebarMenu({ customMenuItems, onMenuItemClick }: Sideba
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  
+  // 모든 카테고리를 기본적으로 열려있게 초기화
+  const getInitialExpandedCategories = () => {
+    const expanded: Record<string, boolean> = {};
+    currentMenuItems.forEach(item => {
+      if (item.isCategory && item.children) {
+        expanded[item.id] = true;
+      }
+    });
+    return expanded;
+  };
+  
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(getInitialExpandedCategories());
   const [mouseLeaveTimer, setMouseLeaveTimer] = useState<NodeJS.Timeout | null>(null);
 
   const shouldShowExpanded = isPinned || isHovering;
@@ -203,6 +215,10 @@ export default function SidebarMenu({ customMenuItems, onMenuItemClick }: Sideba
                     primary={item.label} 
                     sx={{ 
                       opacity: 1,
+                      '& .MuiListItemText-primary': {
+                        fontSize: '0.95rem', // 대메뉴 글자 크기
+                        fontWeight: 500,
+                      }
                     }} 
                   />
                   {item.isCategory && item.children && (
@@ -221,7 +237,7 @@ export default function SidebarMenu({ customMenuItems, onMenuItemClick }: Sideba
                           onClick={() => handleMenuItemClick(childItem)}
                           sx={{
                             minHeight: 36,
-                            pl: 4.5, // 들여쓰기
+                            pl: 4, // 들여쓰기
                             pr: 2,
                           }}
                         >
@@ -238,6 +254,10 @@ export default function SidebarMenu({ customMenuItems, onMenuItemClick }: Sideba
                             primary={childItem.label}
                             sx={{ 
                               opacity: 1,
+                              '& .MuiListItemText-primary': {
+                                fontSize: '0.9rem', // 소메뉴 글자 크기 (대메뉴보다 작게)
+                                fontWeight: 400,
+                              }
                             }}
                           />
                         </ListItemButton>
