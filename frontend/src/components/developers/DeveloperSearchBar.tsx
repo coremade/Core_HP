@@ -158,7 +158,7 @@ export default function DeveloperSearchBar({ onSearch }: DeveloperSearchBarProps
             minHeight: '56px'
           }}>
             {/* 성별 체크박스 */}
-            <Box sx={{ minWidth: 'fit-content' }}>
+            <Box sx={{ minWidth: 'fit-content', ml: 1 }}>
               <Typography variant="subtitle2" sx={{ mb: 0.2, fontWeight: 600, fontSize: '0.8rem' }}>성별</Typography>
               <FormGroup row sx={{ gap: 0.3 }}>
                 <FormControlLabel
