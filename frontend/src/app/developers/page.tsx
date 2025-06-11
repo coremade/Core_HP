@@ -5,6 +5,7 @@ import { Container, Box, Typography, Snackbar, Alert } from '@mui/material';
 import DeveloperList from '../../components/developers/DeveloperList';
 import DeveloperDetailForm from '../../components/developers/DeveloperDetailForm';
 import DeveloperSearchBar from '../../components/developers/DeveloperSearchBar';
+import SidebarMenu from '../../components/common/SidebarMenu';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { developerService } from '../../services/developerService';
 import type { Developer, CreateDeveloperDto } from '../../services/developerService';
@@ -13,27 +14,54 @@ import type { SearchFilters } from '../../components/developers/DeveloperSearchB
 export default function DevelopersPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [gender, setGender] = useState('');
-  const [position, setPosition] = useState('');
-  const [grade, setGrade] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [skills, setSkills] = useState('');
+  const [excludeSkills, setExcludeSkills] = useState('');
+  const [skillsCondition, setSkillsCondition] = useState('OR');
+  const [excludeSkillsCondition, setExcludeSkillsCondition] = useState('OR');
+  const [genders, setGenders] = useState<string[]>([]);
+  const [grades, setGrades] = useState<string[]>([]);
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isCreateMode, setIsCreateMode] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   const queryClient = useQueryClient();
 
+  const handleSearch = (filters: SearchFilters) => {
+    setName(filters.name || '');
+    setPhone(filters.phone || '');
+    setSkills(filters.skills || '');
+    setExcludeSkills(filters.excludeSkills || '');
+    setSkillsCondition(filters.skillsCondition || 'OR');
+    setExcludeSkillsCondition(filters.excludeSkillsCondition || 'OR');
+    setGenders(filters.genders || []);
+    setGrades(filters.grades || []);
+    setPage(1); // Reset to first page on new search
+  };
+
   const { data, isLoading } = useQuery({
-    queryKey: ['developers', page, pageSize, searchKeyword, gender, position, grade],
-    queryFn: () => developerService.getDevelopers({ page, pageSize, searchKeyword, gender, position, grade }),
+    queryKey: ['developers', page, pageSize, name, phone, skills, excludeSkills, skillsCondition, excludeSkillsCondition, genders, grades],
+    queryFn: () => developerService.getDevelopers({ 
+      page, 
+      pageSize, 
+      name,
+      phone,
+      skills,
+      excludeSkills,
+      skillsCondition,
+      excludeSkillsCondition,
+      genders, 
+      grades 
+    }),
   });
 
   const createMutation = useMutation({
     mutationFn: developerService.createDeveloper,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['developers'] });
-      setIsCreating(false);
+      setIsCreateMode(false);
       setSuccessMessage('개발자가 성공적으로 등록되었습니다.');
     },
     onError: (error: any) => {
@@ -68,14 +96,6 @@ export default function DevelopersPage() {
     },
   });
 
-  const handleSearch = (filters: SearchFilters) => {
-    setSearchKeyword(filters.searchKeyword || '');
-    setGender(filters.gender || '');
-    setPosition(filters.position || '');
-    setGrade(filters.grade || '');
-    setPage(1);
-  };
-
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
@@ -87,12 +107,12 @@ export default function DevelopersPage() {
 
   const handleCreateNew = () => {
     setSelectedDeveloper(null);
-    setIsCreating(true);
+    setIsCreateMode(true);
   };
 
   const handleSaveDeveloper = async (developer: Partial<Developer>) => {
     try {
-      if (isCreating) {
+      if (isCreateMode) {
         const newDeveloper: CreateDeveloperDto = {
           developer_name: developer.developer_name || '',
           developer_birth: developer.developer_birth || '',
@@ -124,7 +144,7 @@ export default function DevelopersPage() {
   };
 
   const handleCancel = () => {
-    setIsCreating(false);
+    setIsCreateMode(false);
     setSelectedDeveloper(null);
   };
 
@@ -138,47 +158,50 @@ export default function DevelopersPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Snackbar
-        open={!!successMessage}
-        autoHideDuration={6000}
-        onClose={() => setSuccessMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setSuccessMessage('')}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={!!errorMessage}
-        autoHideDuration={6000}
-        onClose={() => setErrorMessage('')}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={() => setErrorMessage('')}
-          severity="error"
-          sx={{ width: '100%' }}
-        >
-          {errorMessage}
-        </Alert>
-      </Snackbar>
-
-      <Typography variant="h4" component="h1" gutterBottom>
-        개발자 관리
-      </Typography>
-
-      <Box sx={{ mb: 3 }}>
-        <DeveloperSearchBar onSearch={handleSearch} />
-      </Box>
+    <>
+      <SidebarMenu/>
       
-      <Box sx={{ display: 'flex', gap: 3 }}>
-        <Box sx={{ flex: '0 0 50%' }}>
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Snackbar
+          open={!!successMessage}
+          autoHideDuration={6000}
+          onClose={() => setSuccessMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={() => setSuccessMessage('')}
+            severity="success"
+            sx={{ width: '100%' }}
+          >
+            {successMessage}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar
+          open={!!errorMessage}
+          autoHideDuration={6000}
+          onClose={() => setErrorMessage('')}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={() => setErrorMessage('')}
+            severity="error"
+            sx={{ width: '100%' }}
+          >
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+
+        <Typography variant="h4" component="h1" gutterBottom>
+          개발자 관리
+        </Typography>
+
+        <Box sx={{ mb: 3 }}>
+          <DeveloperSearchBar onSearch={handleSearch} />
+        </Box>
+        
+        <Box sx={{ display: 'flex', gap: 3 }}>
+          <Box sx={{ flex: '0 0 50%' }}>
           <DeveloperList
             developers={data?.developers || []}
             selectedDeveloperId={selectedDeveloper?.developer_id || null}
@@ -196,12 +219,13 @@ export default function DevelopersPage() {
         <Box sx={{ flex: '0 0 50%' }}>
           <DeveloperDetailForm
             developer={selectedDeveloper}
-            isCreating={isCreating}
+            isCreating={isCreateMode}
             onSave={handleSaveDeveloper}
             onCancel={handleCancel}
           />
         </Box>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </>
   );
 }

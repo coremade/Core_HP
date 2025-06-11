@@ -5,9 +5,12 @@ const models = {
   Developer: require('./developer.model')(sequelize),
   Project: require('./Project')(sequelize),
   ProjectAssignment: require('./ProjectAssignment')(sequelize),
-  DeveloperSkill: require('./DeveloperSkill')(sequelize),
+  DeveloperSkillInfo: require('./DeveloperSkillInfo')(sequelize),
   MasterCode: require('./masterCode.model')(sequelize),
-  DetailCode: require('./detailCode.model')(sequelize)
+  DetailCode: require('./detailCode.model')(sequelize),
+  SchoolInfo: require('./SchoolInfo')(sequelize),
+  WorkInfo: require('./WorkInfo')(sequelize),
+  CertificationInfo: require('./CertificationInfo')(sequelize)
 };
 
 // Project와 Developer 간의 다대다 관계 설정
@@ -23,12 +26,39 @@ models.Developer.belongsToMany(models.Project, {
   otherKey: 'project_id'
 });
 
-// Developer와 DeveloperSkill 간의 일대다 관계 설정
-models.Developer.hasMany(models.DeveloperSkill, {
+// Developer와 DeveloperSkillInfo 간의 일대다 관계 설정
+models.Developer.hasMany(models.DeveloperSkillInfo, {
   foreignKey: 'developer_id'
 });
 
-models.DeveloperSkill.belongsTo(models.Developer, {
+models.DeveloperSkillInfo.belongsTo(models.Developer, {
+  foreignKey: 'developer_id'
+});
+
+// Developer와 SchoolInfo 간의 일대다 관계 설정
+models.Developer.hasMany(models.SchoolInfo, {
+  foreignKey: 'developer_id'
+});
+
+models.SchoolInfo.belongsTo(models.Developer, {
+  foreignKey: 'developer_id'
+});
+
+// Developer와 WorkInfo 간의 일대다 관계 설정
+models.Developer.hasMany(models.WorkInfo, {
+  foreignKey: 'developer_id'
+});
+
+models.WorkInfo.belongsTo(models.Developer, {
+  foreignKey: 'developer_id'
+});
+
+// Developer와 CertificationInfo 간의 일대다 관계 설정
+models.Developer.hasMany(models.CertificationInfo, {
+  foreignKey: 'developer_id'
+});
+
+models.CertificationInfo.belongsTo(models.Developer, {
   foreignKey: 'developer_id'
 });
 

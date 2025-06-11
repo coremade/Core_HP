@@ -5,9 +5,10 @@ module.exports = (sequelize) => {
     "Developer",
     {
       developer_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DECIMAL(10,0),
+        allowNull: false,
         primaryKey: true,
-        autoIncrement: true,
+        comment: '개발자 ID'
       },
       developer_name: {
         type: DataTypes.STRING(50),
