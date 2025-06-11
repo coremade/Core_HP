@@ -33,7 +33,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await fetch(`http://192.168.0.61:4000/api/projects/${params.id}`);
+        const response = await fetch(`http://localhost:4000/api/projects/${params.id}`);
         if (!response.ok) {
           throw new Error('Project not found');
         }
@@ -67,7 +67,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     if (!editData) return;
 
     try {
-      const response = await fetch(`http://192.168.0.61:4000/api/projects/${params.id}`, {
+      const response = await fetch(`http://localhost:4000/api/projects/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default function ProjectDetail({ params }: { params: { id: string } }) {
     }
 
     try {
-      const response = await fetch(`http://192.168.0.61:4000/api/projects/${params.id}`, {
+      const response = await fetch(`http://localhost:4000/api/projects/${params.id}`, {
         method: 'DELETE',
       });
 

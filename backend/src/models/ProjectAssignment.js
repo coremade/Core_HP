@@ -18,9 +18,25 @@ module.exports = (sequelize) => {
         key: 'developer_id'
       }
     },
-    role: {
+    task: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
+    },
+    start_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('start_date');
+        return rawValue ? rawValue.toISOString().split('T')[0] : null;
+      }
+    },
+    end_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('end_date');
+        return rawValue ? rawValue.toISOString().split('T')[0] : null;
+      }
     },
     status: {
       type: DataTypes.STRING,
@@ -28,7 +44,9 @@ module.exports = (sequelize) => {
     }
   }, {
     tableName: 'project_assignment_info',
-    timestamps: false
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
 
   return ProjectAssignment;
