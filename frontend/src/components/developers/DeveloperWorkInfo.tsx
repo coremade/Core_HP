@@ -41,6 +41,7 @@ interface WorkInfo {
 
 interface DeveloperWorkInfoProps {
   developerId: string;
+  readonly?: boolean;
 }
 
 interface FormErrors {
@@ -64,7 +65,7 @@ const truncateText = (text: string | null | undefined, maxLength: number = 10) =
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 };
 
-export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProps) {
+export default function DeveloperWorkInfo({ developerId, readonly = false }: DeveloperWorkInfoProps) {
   const [works, setWorks] = useState<WorkInfo[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -243,43 +244,47 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAdd}
-          startIcon={<AddIcon />}
-        >
-          근무 이력 추가
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleDeleteSelected}
-          startIcon={<DeleteIcon />}
-          disabled={selectedItems.length === 0}
-        >
-          선택 삭제
-        </Button>
-      </Box>
+      {!readonly && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAdd}
+            startIcon={<AddIcon />}
+          >
+            근무 이력 추가
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteSelected}
+            startIcon={<DeleteIcon />}
+            disabled={selectedItems.length === 0}
+          >
+            선택 삭제
+          </Button>
+        </Box>
+      )}
 
       <TableContainer component={Paper} >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={works.length > 0 && selectedItems.length === works.length}
-                  indeterminate={selectedItems.length > 0 && selectedItems.length < works.length}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedItems(works.map(work => work.work_start_ym));
-                    } else {
-                      setSelectedItems([]);
-                    }
-                  }}
-                />
-              </TableCell>
+              {!readonly && (
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={works.length > 0 && selectedItems.length === works.length}
+                    indeterminate={selectedItems.length > 0 && selectedItems.length < works.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedItems(works.map(work => work.work_start_ym));
+                      } else {
+                        setSelectedItems([]);
+                      }
+                    }}
+                  />
+                </TableCell>
+              )}
               <TableCell>시작년월</TableCell>
               <TableCell>종료년월</TableCell>
               <TableCell>회사명</TableCell>
@@ -291,12 +296,14 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
           <TableBody>
             {works.map((work) => (
               <TableRow key={work.work_start_ym}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedItems.includes(work.work_start_ym)}
-                    onChange={() => handleCheckboxChange(work.work_start_ym)}
-                  />
-                </TableCell>
+                {!readonly && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedItems.includes(work.work_start_ym)}
+                      onChange={() => handleCheckboxChange(work.work_start_ym)}
+                    />
+                  </TableCell>
+                )}
                 <TableCell>{formatYearMonth(work.work_start_ym)}</TableCell>
                 <TableCell>{work.work_end_ym ? formatYearMonth(work.work_end_ym) : '재직중'}</TableCell>
                 <TableCell>{work.work_name}</TableCell>
@@ -306,7 +313,7 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
                   <Button
                     onClick={() => handleEdit(work)}
                   >
-                    수정
+                    {readonly ? '상세보기' : '수정'}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -339,7 +346,12 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
       </Box>
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingItem ? '근무 이력 수정' : '근무 이력 추가'}</DialogTitle>
+        <DialogTitle>
+          {readonly 
+            ? '근무 이력' 
+            : (editingItem ? '근무 이력 수정' : '근무 이력 추가')
+          }
+        </DialogTitle>
         <DialogContent sx={{ px: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
@@ -356,15 +368,17 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
                     console.error('날짜 변환 중 오류:', error);
                   }
                 }}
-                disabled={!!editingItem}
+                disabled={readonly || !!editingItem}
                 views={['year', 'month']}
                 format="yyyy-MM"
                 slotProps={{
                   textField: {
-                    error: !!errors.work_start_ym,
-                    helperText: errors.work_start_ym,
-                    required: true,
+                    error: !readonly && !!errors.work_start_ym,
+                    helperText: !readonly ? errors.work_start_ym : undefined,
+                    required: !readonly,
                     fullWidth: true,
+                    InputProps: { readOnly: readonly },
+                    variant: readonly ? "standard" : "outlined",
                     inputProps: {
                       placeholder: 'YYYY-MM',
                       maxLength: 7
@@ -387,13 +401,16 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
                     console.error('날짜 변환 중 오류:', error);
                   }
                 }}
+                disabled={readonly}
                 views={['year', 'month']}
                 format="yyyy-MM"
                 slotProps={{
                   textField: {
-                    error: !!errors.work_end_ym,
-                    helperText: errors.work_end_ym || '재직중인 경우 비워두세요',
+                    error: !readonly && !!errors.work_end_ym,
+                    helperText: !readonly ? (errors.work_end_ym || '재직중인 경우 비워두세요') : undefined,
                     fullWidth: true,
+                    InputProps: { readOnly: readonly },
+                    variant: readonly ? "standard" : "outlined",
                     inputProps: {
                       placeholder: 'YYYY-MM',
                       maxLength: 7
@@ -406,17 +423,21 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
               label="회사명"
               value={formData.work_name || ''}
               onChange={(e) => setFormData({ ...formData, work_name: e.target.value })}
-              error={!!errors.work_name}
-              helperText={errors.work_name}
-              required
+              error={!readonly && !!errors.work_name}
+              helperText={!readonly ? errors.work_name : undefined}
+              required={!readonly}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
             <TextField
               label="직책"
               value={formData.work_position || ''}
               onChange={(e) => setFormData({ ...formData, work_position: e.target.value })}
-              error={!!errors.work_position}
-              helperText={errors.work_position}
-              required
+              error={!readonly && !!errors.work_position}
+              helperText={!readonly ? errors.work_position : undefined}
+              required={!readonly}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
             <TextField
               label="설명"
@@ -424,12 +445,18 @@ export default function DeveloperWorkInfo({ developerId }: DeveloperWorkInfoProp
               onChange={(e) => setFormData({ ...formData, work_task: e.target.value })}
               multiline
               rows={4}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
-          <Button onClick={handleSubmit} variant="contained">저장</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>
+            {readonly ? '닫기' : '취소'}
+          </Button>
+          {!readonly && (
+            <Button onClick={handleSubmit} variant="contained">저장</Button>
+          )}
         </DialogActions>
       </Dialog>
     </>

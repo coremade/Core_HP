@@ -39,6 +39,7 @@ interface SchoolInfo {
 
 interface DeveloperSchoolInfoProps {
   developerId: string;
+  readonly?: boolean;
 }
 
 interface FormErrors {
@@ -51,7 +52,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4
 
 const pageSizeOptions = [10, 25, 50, 100];
 
-export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfoProps) {
+export default function DeveloperSchoolInfo({ developerId, readonly = false }: DeveloperSchoolInfoProps) {
   const [schools, setSchools] = useState<SchoolInfo[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -234,43 +235,47 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAdd}
-          startIcon={<AddIcon />}
-        >
-          학력 추가
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleDeleteSelected}
-          startIcon={<DeleteIcon />}
-          disabled={selectedItems.length === 0}
-        >
-          선택 삭제
-        </Button>
-      </Box>
+      {!readonly && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAdd}
+            startIcon={<AddIcon />}
+          >
+            학력 추가
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteSelected}
+            startIcon={<DeleteIcon />}
+            disabled={selectedItems.length === 0}
+          >
+            선택 삭제
+          </Button>
+        </Box>
+      )}
 
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={schools.length > 0 && selectedItems.length === schools.length}
-                  indeterminate={selectedItems.length > 0 && selectedItems.length < schools.length}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedItems(schools.map(school => school.school_graduation_ym));
-                    } else {
-                      setSelectedItems([]);
-                    }
-                  }}
-                />
-              </TableCell>
+              {!readonly && (
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={schools.length > 0 && selectedItems.length === schools.length}
+                    indeterminate={selectedItems.length > 0 && selectedItems.length < schools.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedItems(schools.map(school => school.school_graduation_ym));
+                      } else {
+                        setSelectedItems([]);
+                      }
+                    }}
+                  />
+                </TableCell>
+              )}
               <TableCell>졸업년월</TableCell>
               <TableCell>학교명</TableCell>
               <TableCell>전공</TableCell>
@@ -280,12 +285,14 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
           <TableBody>
             {schools.map((school) => (
               <TableRow key={school.school_graduation_ym}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedItems.includes(school.school_graduation_ym)}
-                    onChange={() => handleCheckboxChange(school.school_graduation_ym)}
-                  />
-                </TableCell>
+                {!readonly && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedItems.includes(school.school_graduation_ym)}
+                      onChange={() => handleCheckboxChange(school.school_graduation_ym)}
+                    />
+                  </TableCell>
+                )}
                 <TableCell>{formatGraduationYm(school.school_graduation_ym)}</TableCell>
                 <TableCell>{school.school_name}</TableCell>
                 <TableCell>{school.school_major || '-'}</TableCell>
@@ -293,7 +300,7 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
                   <Button
                     onClick={() => handleEdit(school)}
                   >
-                    수정
+                    {readonly ? '상세보기' : '수정'}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -326,7 +333,12 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
       </Box>
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingItem ? '학력 정보 수정' : '학력 정보 추가'}</DialogTitle>
+        <DialogTitle>
+          {readonly 
+            ? '학력 정보' 
+            : (editingItem ? '학력 정보 수정' : '학력 정보 추가')
+          }
+        </DialogTitle>
         <DialogContent sx={{ px: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
@@ -343,15 +355,17 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
                     console.error('날짜 변환 중 오류:', error);
                   }
                 }}
-                disabled={!!editingItem}
+                disabled={readonly || !!editingItem}
                 views={['year', 'month']}
                 format="yyyy-MM"
                 slotProps={{
                   textField: {
-                    error: !!errors.school_graduation_ym,
-                    helperText: errors.school_graduation_ym,
-                    required: true,
+                    error: !readonly && !!errors.school_graduation_ym,
+                    helperText: !readonly ? errors.school_graduation_ym : undefined,
+                    required: !readonly,
                     fullWidth: true,
+                    InputProps: { readOnly: readonly },
+                    variant: readonly ? "standard" : "outlined",
                     inputProps: {
                       placeholder: 'YYYY-MM',
                       maxLength: 7
@@ -364,23 +378,31 @@ export default function DeveloperSchoolInfo({ developerId }: DeveloperSchoolInfo
               label="학교명"
               value={formData.school_name || ''}
               onChange={(e) => setFormData({ ...formData, school_name: e.target.value })}
-              error={!!errors.school_name}
-              helperText={errors.school_name}
-              required
+              error={!readonly && !!errors.school_name}
+              helperText={!readonly ? errors.school_name : undefined}
+              required={!readonly}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
             <TextField
               label="전공"
               value={formData.school_major || ''}
               onChange={(e) => setFormData({ ...formData, school_major: e.target.value })}
-              error={!!errors.school_major}
-              helperText={errors.school_major}
+              error={!readonly && !!errors.school_major}
+              helperText={!readonly ? errors.school_major : undefined}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
           </Box>
         </DialogContent>
         
         <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
-          <Button onClick={handleSubmit} variant="contained">저장</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>
+            {readonly ? '닫기' : '취소'}
+          </Button>
+          {!readonly && (
+            <Button onClick={handleSubmit} variant="contained">저장</Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
