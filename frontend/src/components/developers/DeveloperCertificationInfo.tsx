@@ -42,6 +42,7 @@ interface CertificationInfo {
 
 interface DeveloperCertificationInfoProps {
   developerId: string;
+  readonly?: boolean;
 }
 
 interface FormErrors {
@@ -54,7 +55,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4
 
 const pageSizeOptions = [10, 25, 50, 100];
 
-export default function DeveloperCertificationInfo({ developerId }: DeveloperCertificationInfoProps) {
+export default function DeveloperCertificationInfo({ developerId, readonly = false }: DeveloperCertificationInfoProps) {
   const [certifications, setCertifications] = useState<CertificationInfo[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -275,43 +276,47 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
 
   return (
     <>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAdd}
-          startIcon={<AddIcon />}
-        >
-          자격증 추가
-        </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleDeleteSelected}
-          startIcon={<DeleteIcon />}
-          disabled={selectedItems.length === 0}
-        >
-          선택 삭제
-        </Button>
-      </Box>
+      {!readonly && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAdd}
+            startIcon={<AddIcon />}
+          >
+            자격증 추가
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDeleteSelected}
+            startIcon={<DeleteIcon />}
+            disabled={selectedItems.length === 0}
+          >
+            선택 삭제
+          </Button>
+        </Box>
+      )}
 
       <TableContainer component={Paper} >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={certifications.length > 0 && selectedItems.length === certifications.length}
-                  indeterminate={selectedItems.length > 0 && selectedItems.length < certifications.length}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedItems(certifications.map(cert => cert.certification_date));
-                    } else {
-                      setSelectedItems([]);
-                    }
-                  }}
-                />
-              </TableCell>
+              {!readonly && (
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={certifications.length > 0 && selectedItems.length === certifications.length}
+                    indeterminate={selectedItems.length > 0 && selectedItems.length < certifications.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedItems(certifications.map(cert => cert.certification_date));
+                      } else {
+                        setSelectedItems([]);
+                      }
+                    }}
+                  />
+                </TableCell>
+              )}
               <TableCell>취득일자</TableCell>
               <TableCell>자격증명</TableCell>
               <TableCell>발급기관</TableCell>
@@ -321,12 +326,14 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
           <TableBody>
             {certifications.map((cert) => (
               <TableRow key={cert.certification_date}>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedItems.includes(cert.certification_date)}
-                    onChange={() => handleCheckboxChange(cert.certification_date)}
-                  />
-                </TableCell>
+                {!readonly && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedItems.includes(cert.certification_date)}
+                      onChange={() => handleCheckboxChange(cert.certification_date)}
+                    />
+                  </TableCell>
+                )}
                 <TableCell>{cert.certification_date}</TableCell>
                 <TableCell>{cert.certification_name}</TableCell>
                 <TableCell>{cert.certification_agency || '-'}</TableCell>
@@ -334,7 +341,7 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
                   <Button
                     onClick={() => handleEdit(cert)}
                   >
-                    수정
+                    {readonly ? '상세보기' : '수정'}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -367,7 +374,12 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
       </Box>
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingItem ? '자격증 정보 수정' : '자격증 정보 추가'}</DialogTitle>
+        <DialogTitle>
+          {readonly 
+            ? '자격증 정보' 
+            : (editingItem ? '자격증 정보 수정' : '자격증 정보 추가')
+          }
+        </DialogTitle>
         <DialogContent sx={{ px: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ko}>
@@ -384,14 +396,16 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
                     console.error('날짜 변환 중 오류:', error);
                   }
                 }}
-                disabled={!!editingItem}
+                disabled={readonly || !!editingItem}
                 format="yyyy-MM-dd"
                 slotProps={{
                   textField: {
-                    error: !!errors.certification_date,
-                    helperText: errors.certification_date,
-                    required: true,
+                    error: !readonly && !!errors.certification_date,
+                    helperText: !readonly ? errors.certification_date : undefined,
+                    required: !readonly,
                     fullWidth: true,
+                    InputProps: { readOnly: readonly },
+                    variant: readonly ? "standard" : "outlined",
                     inputProps: {
                       placeholder: 'YYYY-MM-DD',
                       maxLength: 10
@@ -410,22 +424,31 @@ export default function DeveloperCertificationInfo({ developerId }: DeveloperCer
               label="자격증명"
               value={formData.certification_name || ''}
               onChange={(e) => setFormData({ ...formData, certification_name: e.target.value })}
-              error={!!errors.certification_name}
-              helperText={errors.certification_name}
-              required
+              error={!readonly && !!errors.certification_name}
+              helperText={!readonly ? errors.certification_name : undefined}
+              required={!readonly}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
             <TextField
               label="발급기관"
               value={formData.certification_agency || ''}
               onChange={(e) => setFormData({ ...formData, certification_agency: e.target.value })}
-              error={!!errors.certification_agency}
-              helperText={errors.certification_agency}
+              error={!readonly && !!errors.certification_agency}
+              helperText={!readonly ? errors.certification_agency : undefined}
+              InputProps={{ readOnly: readonly }}
+              variant={readonly ? "standard" : "outlined"}
             />
           </Box>
         </DialogContent>
+        
         <DialogActions sx={{ px: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
-          <Button onClick={handleSubmit} variant="contained">저장</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>
+            {readonly ? '닫기' : '취소'}
+          </Button>
+          {!readonly && (
+            <Button onClick={handleSubmit} variant="contained">저장</Button>
+          )}
         </DialogActions>
       </Dialog>
     </>
