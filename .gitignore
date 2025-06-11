@@ -60,4 +60,7 @@ docker-compose.override.yml
 *~
 
 # TypeScript
-*.tsbuildinfo 
+*.tsbuildinfo
+
+# rules
+.cursor/

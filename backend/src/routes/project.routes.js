@@ -34,6 +34,9 @@ router.delete("/:id", projectController.deleteProject);
 // 프로젝트 개발자 배정
 router.post("/:id/assignments", projectController.assignDeveloper);
 
+// 프로젝트 개발자 배치 배정
+router.post("/:id/assignments/batch", projectController.assignDevelopersBatch);
+
 // 프로젝트 개발자 목록 조회
 router.get("/:id/developers", projectController.getProjectDevelopers);
 
