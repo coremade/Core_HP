@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Project, ProjectFormData, ProjectDeveloper, SearchParams, PaginationInfo } from '@/types/project';
-import { formatDateForAPI, formatDateForDisplay } from '@/utils/projectUtils';
+// import { formatDateForAPI, formatDateForDisplay } from '@/utils/projectUtils';
 import { useSearchStore } from '@/store/searchStore';
-import ModalWrapper from '@/components/common/ModalWrapper';
+// import ModalWrapper from '@/components/common/ModalWrapper';
 import DateInput from '@/components/common/DateInput';
 import ProjectDetailModal from '@/components/projects/ProjectDetailModal';
 import AssignmentModal from '@/components/projects/AssignmentModal';
@@ -27,30 +27,7 @@ interface ExtendedProjectDeveloper extends ProjectDeveloper {
   task?: string;                  // 담당 업무
 }
 
-/**
- * 개발자 검색 상태 관리
- */
-interface SearchState {
-  query: string;
-  page: number;
-  developers: ProjectDeveloper[];
-  hasMore: boolean;
-  isSearching: boolean;
-}
 
-/**
- * 개발자 배정 모달의 Props 타입
- */
-interface AssignmentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  project: Project;
-  selectedDevelopers: ExtendedProjectDeveloper[];
-  setSelectedDevelopers: React.Dispatch<React.SetStateAction<ExtendedProjectDeveloper[]>>;
-  onAddDeveloper: (developer: ProjectDeveloper) => void;
-  onRemoveDeveloper: (developerId: string) => void;
-  fetchProjectDevelopers: (projectId: string) => Promise<void>;
-}
 
 // ================================================================
 // 메인 컴포넌트
@@ -102,20 +79,10 @@ export default function ProjectsPage() {
   // 개발자 배정 관련 상태
   const [projectDevelopers, setProjectDevelopers] = useState<ProjectDeveloper[]>([]);
   const [loadingDevelopers, setLoadingDevelopers] = useState(false);
-  const [searchDevelopers, setSearchDevelopers] = useState<ProjectDeveloper[]>([]);
   const [selectedDevelopers, setSelectedDevelopers] = useState<ExtendedProjectDeveloper[]>([]);
   
-  // 검색 UI 관련 상태
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showArrow, setShowArrow] = useState(false);
-  const [isFirstScroll, setIsFirstScroll] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [unsavedChangesState, setUnsavedChangesState] = useState(false);
-  
-  // 외부 상태 관리
-  const { searchState, searchDevelopers: searchDevelopersStore } = useSearchStore();
+  // 외부 상태 관리 (개발자 배정 모달에서 사용)
+  // const { searchDevelopers: searchDevelopersStore } = useSearchStore();
 
   // 검색 필드의 임시 상태를 저장할 state
   const [searchFields, setSearchFields] = useState({
@@ -232,6 +199,12 @@ export default function ProjectsPage() {
    */
   const handlePageChange = useCallback((newPage: number) => {
     if (newPage === pagination.currentPage) return;
+    
+    // 페이지 변경 시 개발자 배정 현황 초기화
+    setSelectedProjectForAssignment(null);
+    setProjectDevelopers([]);
+    setSelectedDevelopers([]);
+    
     fetchProjects({
       ...searchParams,
       page: newPage
@@ -247,6 +220,12 @@ export default function ProjectsPage() {
    */
   const handleLimitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLimit = Number(e.target.value);
+    
+    // 페이지당 항목 수 변경 시 개발자 배정 현황 초기화
+    setSelectedProjectForAssignment(null);
+    setProjectDevelopers([]);
+    setSelectedDevelopers([]);
+    
     const newParams = {
       ...searchParams,
       page: 1,
@@ -323,19 +302,13 @@ export default function ProjectsPage() {
   const handleShowAssignmentModal = useCallback(() => {
     if (!selectedProjectForAssignment) return;
     setShowAssignmentModal(true);
-    setSearchQuery('');
-    setCurrentPage(1);
-    searchDevelopersStore({}, 1);
-  }, [selectedProjectForAssignment, searchDevelopersStore]);
+  }, [selectedProjectForAssignment]);
 
   /**
    * 개발자 배정 모달 닫기
    */
   const handleCloseAssignmentModal = useCallback(() => {
     setShowAssignmentModal(false);
-    setSearchQuery('');
-    setCurrentPage(1);
-    setHasMore(false);
   }, []);
 
   /**
@@ -376,58 +349,6 @@ export default function ProjectsPage() {
   }, []);
 
   // ================================================================
-  // UI 이벤트 핸들러 영역
-  // ================================================================
-  
-  /**
-   * 모달 외부 클릭 시 닫기
-   */
-  const handleModalOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      handleCloseAssignmentModal();
-    }
-  };
-
-  /**
-   * 모달 내부 클릭 시 이벤트 전파 중단
-   */
-  const handleModalInsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-  };
-
-  /**
-   * 모달 스크롤 핸들러 - 무한 스크롤 구현
-   */
-  const handleModalScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    
-    // 스크롤이 하단에 도달했는지 확인
-    if (scrollHeight - scrollTop <= clientHeight + 100) {
-      if (isFirstScroll && hasMore && !isSearching) {
-        // 처음 하단에 도달했을 때 화살표만 표시
-        setShowArrow(true);
-        setIsFirstScroll(false);
-      } else if (!isFirstScroll && hasMore && !isSearching) {
-        // 두 번째 이후 스크롤에서 데이터 로드
-        searchDevelopersStore({ 
-          developer_name: searchQuery 
-        }, currentPage + 1);
-        setShowArrow(false);
-      }
-    }
-  };
-
-  /**
-   * 화살표 클릭 핸들러
-   */
-  const handleArrowClick = () => {
-    searchDevelopersStore({ 
-      developer_name: searchQuery 
-    }, currentPage + 1);
-    setShowArrow(false);
-  };
-
-  // ================================================================
   // 생명주기 관리 영역
   // ================================================================
   
@@ -454,96 +375,7 @@ export default function ProjectsPage() {
     };
   }, [showModal, showDetailModal, showAssignmentModal]);
 
-  // ================================================================
-  // 계산된 값 영역
-  // ================================================================
-  
-  /**
-   * 이미 선택된 개발자를 제외한 검색 결과 필터링
-   */
-  const filteredDevelopers = useMemo(() => 
-    searchState.developers.filter(developer => 
-      !selectedDevelopers.some(selected => selected.developer_id === developer.developer_id)
-    ),
-    [searchState.developers, selectedDevelopers]
-  );
 
-  /**
-   * 저장되지 않은 변경사항 확인
-   */
-  const hasUnsavedChanges = useMemo(() => {
-    const hasAddedDevelopers = selectedDevelopers.some((dev: ExtendedProjectDeveloper) => dev.isNewlyAdded);
-    const hasRemovedDevelopers = selectedDevelopers.some((dev: ExtendedProjectDeveloper) => dev.isMarkedForDeletion);
-    return hasAddedDevelopers || hasRemovedDevelopers;
-  }, [selectedDevelopers]);
-
-  /**
-   * 모달 닫기 처리 - 변경사항 확인
-   */
-  const handleCloseModal = useCallback(() => {
-    if (hasUnsavedChanges) {
-      const message = `저장되지 않은 변경사항이 있습니다. 정말로 닫으시겠습니까?`;
-      if (!confirm(message)) {
-        return;
-      }
-    }
-    handleCloseAssignmentModal();
-  }, [hasUnsavedChanges, handleCloseAssignmentModal]);
-
-  /**
-   * 개발자 배정 저장
-   */
-  const handleSaveAssignments = async () => {
-    if (!selectedProjectForAssignment) return;
-
-    // 변경사항이 있는지 확인
-    if (!hasUnsavedChanges) {
-      handleCloseAssignmentModal();
-      return;
-    }
-
-    const addedDevelopers = selectedDevelopers.filter((dev: ExtendedProjectDeveloper) => dev.isNewlyAdded);
-    const removedDevelopers = selectedDevelopers.filter((dev: ExtendedProjectDeveloper) => dev.isMarkedForDeletion);
-
-    const confirmMessage = `다음 변경사항을 저장하시겠습니까?\n` +
-      `- 추가될 개발자: ${addedDevelopers.length}명\n` +
-      `- 제외될 개발자: ${removedDevelopers.length}명`;
-
-    if (!confirm(confirmMessage)) {
-      return;
-    }
-
-    try {
-      const assignments = selectedDevelopers
-        .filter((developer: ExtendedProjectDeveloper) => !developer.isMarkedForDeletion || developer.isNewlyAdded)
-        .map(developer => ({
-          project_id: selectedProjectForAssignment.project_id,
-          developer_id: developer.developer_id,
-          task: developer.task || '',
-          start_date: formatDateForAPI(developer.start_date),
-          end_date: formatDateForAPI(developer.end_date),
-          status: 'ACTIVE'
-        }));
-
-      const response = await fetch(`http://localhost:4000/api/projects/${selectedProjectForAssignment.project_id}/assignments/batch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ assignments }),
-      });
-
-      if (!response.ok) {
-        throw new Error('개발자 배정 저장에 실패했습니다.');
-      }
-
-      await fetchProjectDevelopers(selectedProjectForAssignment.project_id);
-      handleCloseAssignmentModal();
-    } catch (error) {
-      console.error('Error saving assignments:', error);
-      alert('개발자 배정 저장에 실패했습니다.');
-    }
-  };
 
   // ================================================================
   // 로딩 상태 처리
@@ -929,6 +761,14 @@ export default function ProjectsPage() {
               onClose={() => setShowDetailModal(false)}
               project={selectedProject}
               onSave={handleProjectUpdate}
+              onDelete={() => {
+                setShowDetailModal(false);
+                setSelectedProject(null);
+                setSelectedProjectForAssignment(null);
+                setProjectDevelopers([]);
+                setSelectedDevelopers([]);
+                fetchProjects();
+              }}
               mode="view"
             />
           )}
@@ -944,6 +784,7 @@ export default function ProjectsPage() {
               onAddDeveloper={handleAddDeveloper}
               onRemoveDeveloper={handleRemoveDeveloper}
               fetchProjectDevelopers={fetchProjectDevelopers}
+              onAssignmentUpdate={fetchProjects}
             />
           )}
         </div>

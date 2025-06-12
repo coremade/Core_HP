@@ -32,6 +32,7 @@ interface AssignmentModalProps {
   onAddDeveloper: (developer: ProjectDeveloper) => void;
   onRemoveDeveloper: (developerId: string) => void;
   fetchProjectDevelopers: (projectId: string) => Promise<void>;
+  onAssignmentUpdate?: () => void;  // 배정 변경 시 프로젝트 목록 재렌더링을 위한 콜백
 }
 
 // ================================================================
@@ -52,7 +53,8 @@ const AssignmentModal = ({
   setSelectedDevelopers,
   onAddDeveloper,
   onRemoveDeveloper,
-  fetchProjectDevelopers
+  fetchProjectDevelopers,
+  onAssignmentUpdate
 }: AssignmentModalProps) => {
   // ================================================================
   // 상태 관리 영역
@@ -180,6 +182,12 @@ const AssignmentModal = ({
       }
 
       await fetchProjectDevelopers(project.project_id);
+      
+      // 프로젝트 목록도 재렌더링 (개발자 수 업데이트를 위해)
+      if (onAssignmentUpdate) {
+        onAssignmentUpdate();
+      }
+      
       onClose();
     } catch (error) {
       console.error('Error saving assignments:', error);

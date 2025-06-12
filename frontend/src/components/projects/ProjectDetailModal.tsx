@@ -16,6 +16,7 @@ interface ProjectDetailModalProps {
   onClose: () => void;
   project?: Project | null;                   // Optional for create mode
   onSave: (updatedProject: Project) => void;
+  onDelete?: () => void;                      // 프로젝트 삭제 시 호출될 콜백
   mode?: 'create' | 'view';                   // 'create' for new project, 'view' for existing project
 }
 
@@ -55,6 +56,7 @@ const ProjectDetailModal = ({
   onClose,
   project,
   onSave,
+  onDelete,
   mode = 'view',
 }: ProjectDetailModalProps) => {
   // ================================================================
@@ -210,7 +212,11 @@ const ProjectDetailModal = ({
       }
 
       onClose();
-      window.location.reload();
+      
+      // 프로젝트 목록 재렌더링 (window.location.reload() 대신)
+      if (onDelete) {
+        onDelete();
+      }
     } catch (error) {
       console.error('Error deleting project:', error);
       alert('프로젝트 삭제에 실패했습니다.');
