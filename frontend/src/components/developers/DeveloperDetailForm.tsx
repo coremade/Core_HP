@@ -40,9 +40,13 @@ import DeveloperSchoolInfo from './DeveloperSchoolInfo';
 import DeveloperWorkInfo from './DeveloperWorkInfo';
 import DeveloperCertificationInfo from './DeveloperCertificationInfo';
 
+
+
+
 interface DeveloperDetailFormProps {
   developer: Developer | null;
   isCreating?: boolean;
+  readonly?: boolean;
   onSave: (developer: Partial<Developer>) => void;
   onCancel?: () => void;
 }
@@ -154,6 +158,7 @@ const normalizeImageUrl = (imageUrl: string | undefined) => {
 export default function DeveloperDetailForm({ 
   developer, 
   isCreating = false,
+  readonly = false,
   onSave,
   onCancel
 }: DeveloperDetailFormProps) {
@@ -457,17 +462,18 @@ export default function DeveloperDetailForm({
         ...formData,
         [field]: date.toISOString().split('T')[0],
       });
-    }
-  };
+          }
+    };
 
   return (
+    
     <Paper sx={{ p: 2, height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0 }}>
         <Typography variant="h6">
           {isCreating ? '새 개발자 등록' : '개발자 상세 정보'}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {currentTab === TabType.BASIC_INFO && (
+          {currentTab === TabType.BASIC_INFO && !readonly && (
             <>
               {(isEditing || isCreating) && (
                 <Button
@@ -489,7 +495,6 @@ export default function DeveloperDetailForm({
           )}
         </Box>
       </Box>
-
       <Snackbar
         open={showErrorMessage}
         autoHideDuration={6000}
@@ -877,18 +882,22 @@ export default function DeveloperDetailForm({
         ) : currentTab === TabType.EDUCATION ? (
           <DeveloperSchoolInfo
             developerId={developer?.developer_id || ''}
+            readonly={readonly}
           />
         ) : currentTab === TabType.CERTIFICATION ? (
           <DeveloperCertificationInfo
             developerId={developer?.developer_id || ''}
+            readonly={readonly}
           />
         ) : currentTab === TabType.WORK_HISTORY ? (
           <DeveloperWorkInfo
             developerId={developer?.developer_id || ''}
+            readonly={readonly}
           />
         ) : (
           <DeveloperSkillInfo
             developerId={developer?.developer_id || ''}
+            readonly={readonly}
           />
         )}
       </Box>
