@@ -257,7 +257,7 @@ export default function DeveloperSchoolInfo({ developerId, readonly = false }: D
         </Box>
       )}
 
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
+      <TableContainer component={Paper} >
         <Table>
           <TableHead>
             <TableRow>

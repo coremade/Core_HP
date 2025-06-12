@@ -5,6 +5,7 @@ import {
   Work as WorkIcon,
   Assignment as AssignmentIcon,
   PersonAdd as PersonAddIcon,
+  AttachFile as AttachFileIcon,
 } from '@mui/icons-material';
 
 export interface SidebarMenuItem {
@@ -40,6 +41,15 @@ export const menuItems: SidebarMenuItem[] = [
         path: '/developers',
         onClick: () => {
           window.location.href = '/developers';
+        },
+      },
+      {
+        id: 'developer-resumes-list',
+        label: '이력서 관리',
+        icon: <AttachFileIcon />,
+        path: '/resumes',
+        onClick: () => {
+          window.location.href = '/resumes';
         },
       },
     ],

@@ -70,7 +70,7 @@ module.exports = (sequelize) => {
     },
     project_id: {
       type: DataTypes.STRING(36),
-      allowNull: true
+      allowNull: false
     }
   }, {
     tableName: 'developer_skill_info',
