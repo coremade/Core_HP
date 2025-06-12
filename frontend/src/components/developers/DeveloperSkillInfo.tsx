@@ -19,7 +19,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  SelectChangeEvent
+  SelectChangeEvent,
+  Typography
 } from '@mui/material';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
@@ -113,12 +114,51 @@ export default function DeveloperSkillInfo({ developerId, readonly = false }: De
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
+  const [careerMonths, setCareerMonths] = useState<number>(0);
 
   const handleChange = useCallback((field: string) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
     setFormData(prev => ({
       ...prev,
       [field]: event.target.value
     }));
+  }, []);
+
+  // 경력 개월을 계산하는 함수
+  const calculateCareerMonths = useCallback((skills: ApiSkillInfo[]) => {
+    if (skills.length === 0) {
+      setCareerMonths(0);
+      return;
+    }
+
+    let totalMonths = 0;
+    
+    skills.forEach(skill => {
+      const startYM = skill.project_start_ym.replace('-', ''); // YYYY-MM -> YYYYMM
+      let endYM: string;
+      
+      if (skill.project_end_ym) {
+        endYM = skill.project_end_ym.replace('-', ''); // YYYY-MM -> YYYYMM
+      } else {
+        // 종료일이 없으면 현재 연월 사용
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+        endYM = currentYear + currentMonth;
+      }
+      
+      // 연월을 숫자로 변환하여 계산
+      const startYear = parseInt(startYM.substring(0, 4));
+      const startMonth = parseInt(startYM.substring(4, 6));
+      const endYear = parseInt(endYM.substring(0, 4));
+      const endMonth = parseInt(endYM.substring(4, 6));
+      
+      // 시작월부터 종료월까지 포함한 개월 수 계산
+      const months = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+      
+      totalMonths += Math.max(0, months);
+    });
+    
+    setCareerMonths(totalMonths);
   }, []);
 
   const loadSkills = useCallback(async () => {
@@ -133,12 +173,14 @@ export default function DeveloperSkillInfo({ developerId, readonly = false }: De
       }));
       setSkills(formattedSkills);
       setTotal(response.data.total || 0);
+      calculateCareerMonths(formattedSkills);
     } catch (error) {
       console.error('기술 이력 조회 중 오류:', error);
       setSkills([]);
       setTotal(0);
+      setCareerMonths(0);
     }
-  }, [developerId]);
+  }, [developerId, calculateCareerMonths]);
 
   const validateForm = useCallback(() => {
     const newErrors: FormErrors = {};
@@ -491,25 +533,44 @@ export default function DeveloperSkillInfo({ developerId, readonly = false }: De
   };
 
   const SkillInfoContent = (
-    <Box>
+    <>
       {!readonly && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            기술 이력 추가
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDeleteSelected}
-            startIcon={<DeleteIcon />}
-            disabled={selectedItems.length === 0}
-          >
-            선택 삭제
-          </Button>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', minWidth: '80px' }}>
+              경력 개월 :
+            </Typography>
+            <TextField
+              value={careerMonths}
+              size="small"
+              sx={{ width: '100px' }}
+              InputProps={{ 
+                readOnly: true,
+                style: { fontSize: '0.875rem' }
+              }}
+              variant="outlined"
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
+            >
+              기술 이력 추가
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteSelected}
+              startIcon={<DeleteIcon />}
+              disabled={selectedItems.length === 0}
+            >
+              선택 삭제
+            </Button>
+          </Box>
+          
+
         </Box>
       )}
 
@@ -530,7 +591,7 @@ export default function DeveloperSkillInfo({ developerId, readonly = false }: De
       </Box>
 
       {EditDialog}
-    </Box>
+    </>
   );
 
   return SkillInfoContent;

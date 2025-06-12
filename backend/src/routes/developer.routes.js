@@ -5,6 +5,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { v4: uuidv4 } = require('uuid');
 const { Op } = require("sequelize");
 const { Developer } = require("../models");
 const { SchoolInfo, CertificationInfo, WorkInfo, SkillInfo, DeveloperSkillInfo } = require("../models");
@@ -107,6 +108,8 @@ router.get("/", async (req, res) => {
           // 각 기술에 대한 OR 조건 생성
           const excludeSkillConditions = excludeSkillsArray.map(skill => ({
             [Op.or]: [
+              { project_name: { [Op.like]: `%${skill}%` } },
+              { task: { [Op.like]: `%${skill}%` } },
               { project_skill_model: { [Op.like]: `%${skill}%` } },
               { project_skill_os: { [Op.like]: `%${skill}%` } },
               { project_skill_language: { [Op.like]: `%${skill}%` } },
@@ -150,6 +153,8 @@ router.get("/", async (req, res) => {
           // 각 기술에 대한 OR 조건 생성
           const skillConditions = skillsArray.map(skill => ({
             [Op.or]: [
+              { project_name: { [Op.like]: `%${skill}%` } },
+              { task: { [Op.like]: `%${skill}%` } },
               { project_skill_model: { [Op.like]: `%${skill}%` } },
               { project_skill_os: { [Op.like]: `%${skill}%` } },
               { project_skill_language: { [Op.like]: `%${skill}%` } },
@@ -901,9 +906,32 @@ router.post("/:id/schools", async (req, res) => {
         return res.status(400).json({ message: "해당 시작년월의 기술 이력이 이미 존재합니다." });
       }
   
+      // 프로젝트 개월 수 계산
+      const calculateProjectMonths = (startYM, endYM) => {
+        const startYear = parseInt(startYM.substring(0, 4));
+        const startMonth = parseInt(startYM.substring(4, 6));
+        
+        let endYear, endMonth;
+        if (endYM) {
+          endYear = parseInt(endYM.substring(0, 4));
+          endMonth = parseInt(endYM.substring(4, 6));
+        } else {
+          // 종료일이 없으면 현재 연월 사용
+          const now = new Date();
+          endYear = now.getFullYear();
+          endMonth = now.getMonth() + 1;
+        }
+        
+        // 시작월부터 종료월까지 포함한 개월 수 계산
+        return Math.max(1, (endYear - startYear) * 12 + (endMonth - startMonth) + 1);
+      };
+
+      const projectMonths = calculateProjectMonths(project_start_ym, project_end_ym);
+
       // 새 기술 이력 생성
       const skill = await DeveloperSkillInfo.create({
         developer_id: developerId,
+        project_id: uuidv4(),
         project_start_ym,
         project_end_ym,
         project_name,
@@ -916,7 +944,8 @@ router.post("/:id/schools", async (req, res) => {
         project_skill_dbms,
         project_skill_tool,
         project_skill_protocol,
-        project_skill_etc
+        project_skill_etc,
+        project_month: projectMonths
       });
   
       res.status(201).json(skill);
@@ -974,6 +1003,28 @@ router.post("/:id/schools", async (req, res) => {
         return res.status(404).json({ message: "기술 이력을 찾을 수 없습니다." });
       }
   
+      // 프로젝트 개월 수 계산
+      const calculateProjectMonths = (startYM, endYM) => {
+        const startYear = parseInt(startYM.substring(0, 4));
+        const startMonth = parseInt(startYM.substring(4, 6));
+        
+        let endYear, endMonth;
+        if (endYM) {
+          endYear = parseInt(endYM.substring(0, 4));
+          endMonth = parseInt(endYM.substring(4, 6));
+        } else {
+          // 종료일이 없으면 현재 연월 사용
+          const now = new Date();
+          endYear = now.getFullYear();
+          endMonth = now.getMonth() + 1;
+        }
+        
+        // 시작월부터 종료월까지 포함한 개월 수 계산
+        return Math.max(1, (endYear - startYear) * 12 + (endMonth - startMonth) + 1);
+      };
+
+      const projectMonths = calculateProjectMonths(projectStartYm, project_end_ym);
+
       // 기술 이력 수정
       const [updated] = await DeveloperSkillInfo.update(
         {
@@ -988,7 +1039,8 @@ router.post("/:id/schools", async (req, res) => {
           project_skill_dbms,
           project_skill_tool,
           project_skill_protocol,
-          project_skill_etc
+          project_skill_etc,
+          project_month: projectMonths
         },
         {
           where: {
