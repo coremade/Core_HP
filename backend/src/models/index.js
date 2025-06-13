@@ -10,7 +10,8 @@ const models = {
   DetailCode: require('./detailCode.model')(sequelize),
   SchoolInfo: require('./SchoolInfo')(sequelize),
   WorkInfo: require('./WorkInfo')(sequelize),
-  CertificationInfo: require('./CertificationInfo')(sequelize)
+  CertificationInfo: require('./CertificationInfo')(sequelize),
+  Notice: require('./notice.model')(sequelize),
 };
 
 // Project와 Developer 간의 다대다 관계 설정

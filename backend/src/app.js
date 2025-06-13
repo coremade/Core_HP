@@ -10,6 +10,7 @@ const resumeRoutes = require("./routes/resume.routes");
 const skillRoutes = require("./routes/skill.routes");
 const projectRoutes = require("./routes/project.routes");
 const codeRoutes = require("./routes/code.routes");
+const noticeRoutes = require("./routes/notice.routes");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -46,6 +47,7 @@ app.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       developers: "/api/developers",
+      notices: "/api/notices"
     },
   });
 });
@@ -55,6 +57,7 @@ app.use("/api/resumes", resumeRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/codes", codeRoutes);
+app.use("/api/notices", noticeRoutes);
 
 // 데이터베이스 연결 및 서버 시작
 sequelize

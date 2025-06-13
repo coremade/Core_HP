@@ -159,6 +159,18 @@ CREATE TABLE work_info
   PRIMARY KEY (developer_id, work_start_ym)
 ) COMMENT '근무 이력 정보';
 
+CREATE TABLE notice (
+    notice_id         DECIMAL(10,0)  NOT NULL COMMENT '게시글 번호',
+    title             VARCHAR(200)   NOT NULL COMMENT '제목',
+    content           TEXT           NOT NULL COMMENT '내용',
+    author            VARCHAR(20)    NOT NULL COMMENT '작성자',
+    is_important      CHAR(1)        NULL     DEFAULT 'N' COMMENT '중요여부',
+    views             DECIMAL(10,0)  NOT NULL DEFAULT 0 COMMENT '조회수';
+    created_at        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일시',
+    updated_at        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '수정일시',
+    PRIMARY KEY (notice_id)
+) COMMENT '공지사항';
+
 ALTER TABLE common_code_detail
   ADD CONSTRAINT FK_common_code_master_TO_common_code_detail
     FOREIGN KEY (master_id)
